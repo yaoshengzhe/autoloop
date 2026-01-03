@@ -1,0 +1,32 @@
+{
+  "name": "autoloop",
+  "version": "0.1.0",
+  "description": "Autonomous iterative loop for Claude Code - keeps working until the task is done",
+  "author": "Shengzhe",
+  "repository": "https://github.com/shengzhe/autoloop",
+  "commands": [
+    {
+      "name": "autoloop",
+      "description": "Start an iterative loop that continues until a completion promise is met",
+      "file": "../commands/autoloop.md"
+    },
+    {
+      "name": "cancel-autoloop",
+      "description": "Cancel the active autoloop",
+      "file": "../commands/cancel-autoloop.md"
+    },
+    {
+      "name": "autoloop-help",
+      "description": "Show autoloop usage and documentation",
+      "file": "../commands/autoloop-help.md"
+    }
+  ],
+  "hooks": {
+    "Stop": [
+      {
+        "command": "../hooks/stop.sh",
+        "timeout": 10000
+      }
+    ]
+  }
+}
