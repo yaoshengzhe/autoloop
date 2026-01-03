@@ -17,9 +17,13 @@ Autoloop changes this dynamic:
 
 ## Quick Start
 
-### 1. Install the Plugin
+### 1. Install
 
 ```bash
+# From GitHub
+claude plugin install https://github.com/anthropics/autoloop/tree/main/plugins/claude-code
+
+# From local clone
 claude plugin install ./plugins/claude-code
 ```
 
@@ -78,6 +82,19 @@ Each iteration builds on the last. The agent reviews what it built, identifies g
 **Include verification steps in your prompt.** Ask the agent to run tests or validate its work before claiming completion.
 
 **Use git commits as checkpoints.** Instruct the agent to commit after each milestone so you can review progress.
+
+## Plugin Management
+
+```bash
+# Install
+claude plugin install https://github.com/anthropics/autoloop/tree/main/plugins/claude-code
+
+# Update (reinstall latest)
+claude plugin install https://github.com/anthropics/autoloop/tree/main/plugins/claude-code --force
+
+# Uninstall
+claude plugin uninstall autoloop
+```
 
 ## Architecture
 
