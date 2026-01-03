@@ -3,11 +3,21 @@
  * Handles iteration tracking, completion promises, and state persistence
  */
 
+// Maximum allowed iterations to prevent resource exhaustion
+const MAX_ITERATIONS_LIMIT = 10000;
+
 export class LoopState {
   constructor(options = {}) {
     this.prompt = options.prompt || '';
     this.completionPromise = options.completionPromise || null;
-    this.maxIterations = options.maxIterations || null;
+
+    // Validate and cap maxIterations
+    let maxIter = options.maxIterations || null;
+    if (maxIter !== null && maxIter > MAX_ITERATIONS_LIMIT) {
+      maxIter = MAX_ITERATIONS_LIMIT;
+    }
+    this.maxIterations = maxIter;
+
     this.currentIteration = options.currentIteration || 0;
     this.startTime = options.startTime || Date.now();
     this.active = options.active ?? true;

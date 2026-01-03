@@ -59,6 +59,11 @@ HELP_EOF
         echo "Error: --max-iterations must be a positive integer, got: $2" >&2
         exit 1
       fi
+      # Validate reasonable upper bound (prevent resource exhaustion)
+      if [[ "$2" -gt 10000 ]]; then
+        echo "Error: --max-iterations cannot exceed 10000" >&2
+        exit 1
+      fi
       MAX_ITERATIONS="$2"
       shift 2
       ;;
