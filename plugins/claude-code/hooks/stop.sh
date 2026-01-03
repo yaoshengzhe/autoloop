@@ -30,9 +30,10 @@ if [[ "$ACTIVE" != "true" ]]; then
 fi
 
 # Check for completion promise in transcript
+# Use grep -F for fixed string matching to prevent regex injection
 if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
   if [[ -n "${CLAUDE_TRANSCRIPT:-}" ]]; then
-    if echo "$CLAUDE_TRANSCRIPT" | grep -q "<promise>.*${COMPLETION_PROMISE}.*</promise>"; then
+    if echo "$CLAUDE_TRANSCRIPT" | grep -qF "<promise>${COMPLETION_PROMISE}</promise>"; then
       rm -f "$STATE_FILE"
       echo ""
       echo "AUTOLOOP COMPLETE - Promise fulfilled after $ITERATION iteration(s)"
