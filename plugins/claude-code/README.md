@@ -9,7 +9,7 @@ Transform Claude Code into an autonomous coding agent that works until your task
 claude plugin marketplace add yaoshengzhe/autoloop
 
 # Install the plugin
-claude plugin install autoloop@yaoshengzhe-autoloop
+claude plugin install autoloop@autoloop
 
 # Or install from local clone
 claude plugin install ./plugins/claude-code
@@ -22,7 +22,7 @@ claude plugin install ./plugins/claude-code
 
 ```bash
 # Update to latest
-claude plugin install autoloop@yaoshengzhe-autoloop --force
+claude plugin install autoloop@autoloop --force
 
 # Remove
 claude plugin uninstall autoloop

@@ -24,7 +24,7 @@ Autoloop changes this dynamic:
 claude plugin marketplace add yaoshengzhe/autoloop
 
 # Install the plugin
-claude plugin install autoloop@yaoshengzhe-autoloop
+claude plugin install autoloop@autoloop
 
 # Or install from local clone
 claude plugin install ./plugins/claude-code
@@ -93,10 +93,10 @@ Each iteration builds on the last. The agent reviews what it built, identifies g
 claude plugin marketplace add yaoshengzhe/autoloop
 
 # Install
-claude plugin install autoloop@yaoshengzhe-autoloop
+claude plugin install autoloop@autoloop
 
 # Update (reinstall latest)
-claude plugin install autoloop@yaoshengzhe-autoloop --force
+claude plugin install autoloop@autoloop --force
 
 # Uninstall
 claude plugin uninstall autoloop
