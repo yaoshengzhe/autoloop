@@ -1,20 +1,18 @@
 /**
  * Claude Code adapter
- * Handles state persistence using .claude directory and local markdown files
+ * Handles state persistence using YAML frontmatter in .claude/autoloop.local.md
  */
 
 import { readFile, writeFile, unlink, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { existsSync } from 'node:fs';
 
-const STATE_FILE = '.claude/autoloop.state.json';
-const LOCAL_MD_FILE = '.claude/autoloop.local.md';
+const STATE_FILE = '.claude/autoloop.local.md';
 
 export class ClaudeCodeAdapter {
   constructor(workingDir = process.cwd()) {
     this.workingDir = workingDir;
     this.stateFile = join(workingDir, STATE_FILE);
-    this.localMdFile = join(workingDir, LOCAL_MD_FILE);
   }
 
   /**
@@ -28,13 +26,63 @@ export class ClaudeCodeAdapter {
   }
 
   /**
+   * Parse YAML frontmatter from markdown content
+   * @param {string} content
+   * @returns {object}
+   */
+  parseYamlFrontmatter(content) {
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!frontmatterMatch) return null;
+
+    const yaml = frontmatterMatch[1];
+    const data = {};
+
+    for (const line of yaml.split('\n')) {
+      const match = line.match(/^(\w+):\s*(.*)$/);
+      if (match) {
+        let value = match[2].trim();
+        // Remove quotes if present
+        if (value.startsWith('"') && value.endsWith('"')) {
+          value = value.slice(1, -1);
+        }
+        // Parse special values
+        if (value === 'true') value = true;
+        else if (value === 'false') value = false;
+        else if (value === 'null') value = null;
+        else if (/^\d+$/.test(value)) value = parseInt(value, 10);
+
+        data[match[1]] = value;
+      }
+    }
+
+    // Extract prompt (content after frontmatter)
+    const promptMatch = content.match(/^---\n[\s\S]*?\n---\n\n?([\s\S]*)$/);
+    if (promptMatch) {
+      data.prompt = promptMatch[1].trim();
+    }
+
+    return data;
+  }
+
+  /**
    * Read loop state from file
    * @returns {Promise<object|null>}
    */
   async readState() {
     try {
       const content = await readFile(this.stateFile, 'utf-8');
-      return JSON.parse(content);
+      const data = this.parseYamlFrontmatter(content);
+      if (!data) return null;
+
+      // Map YAML keys to internal state format
+      return {
+        prompt: data.prompt || '',
+        completionPromise: data.completion_promise,
+        maxIterations: data.max_iterations || null,
+        currentIteration: data.iteration || 0,
+        startTime: data.started_at ? new Date(data.started_at).getTime() : Date.now(),
+        active: data.active ?? false
+      };
     } catch (err) {
       if (err.code === 'ENOENT') {
         return null;
@@ -44,55 +92,37 @@ export class ClaudeCodeAdapter {
   }
 
   /**
-   * Write loop state to file
-   * Also writes a human-readable .local.md file for hooks
+   * Write loop state to file with YAML frontmatter
    * @param {LoopState} state
    */
   async writeState(state) {
     await this.ensureDir();
     const data = state.toJSON ? state.toJSON() : state;
 
-    // Write JSON state
-    await writeFile(this.stateFile, JSON.stringify(data, null, 2), 'utf-8');
+    const completionPromise = data.completionPromise
+      ? `"${data.completionPromise}"`
+      : 'null';
 
-    // Write human-readable markdown for hooks
-    const md = this.generateLocalMd(data);
-    await writeFile(this.localMdFile, md, 'utf-8');
+    const md = `---
+active: ${data.active}
+iteration: ${data.currentIteration}
+max_iterations: ${data.maxIterations || 0}
+completion_promise: ${completionPromise}
+started_at: "${new Date(data.startTime).toISOString()}"
+---
+
+${data.prompt || ''}
+`;
+
+    await writeFile(this.stateFile, md, 'utf-8');
   }
 
   /**
-   * Generate human-readable local.md content
-   * @param {object} data
-   * @returns {string}
-   */
-  generateLocalMd(data) {
-    const lines = [
-      '# Autoloop State',
-      '',
-      `active: ${data.active}`,
-      `iteration: ${data.currentIteration}${data.maxIterations ? '/' + data.maxIterations : ''}`,
-      `completion_promise: ${data.completionPromise ? '"' + data.completionPromise + '"' : 'null'}`,
-      `started: ${new Date(data.startTime).toISOString()}`,
-      '',
-      '## Prompt',
-      '',
-      data.prompt || '(no prompt)',
-      ''
-    ];
-    return lines.join('\n');
-  }
-
-  /**
-   * Clear state files
+   * Clear state file
    */
   async clearState() {
     try {
       await unlink(this.stateFile);
-    } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
-    }
-    try {
-      await unlink(this.localMdFile);
     } catch (err) {
       if (err.code !== 'ENOENT') throw err;
     }

@@ -2,7 +2,6 @@
 node_modules/
 
 # Autoloop state files (should not be committed)
-.claude/autoloop.state.json
 .claude/autoloop.local.md
 
 # OS files
