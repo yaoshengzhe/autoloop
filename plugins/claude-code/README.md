@@ -2,21 +2,30 @@
 
 Transform Claude Code into an autonomous coding agent that works until your task is complete.
 
-## Getting Started
-
-### Installation
-
-Install the plugin from the autoloop repository:
+## Installation
 
 ```bash
+# From GitHub
+claude plugin install https://github.com/anthropics/autoloop/tree/main/plugins/claude-code
+
+# From local clone
 claude plugin install ./plugins/claude-code
-```
 
-Verify the installation:
-
-```bash
+# Verify
 /autoloop --help
 ```
+
+## Update / Uninstall
+
+```bash
+# Update to latest
+claude plugin install https://github.com/anthropics/autoloop/tree/main/plugins/claude-code --force
+
+# Remove
+claude plugin uninstall autoloop
+```
+
+## Getting Started
 
 ### Your First Autonomous Loop
 
