@@ -6,7 +6,7 @@ Transform Claude Code into an autonomous coding agent that works until your task
 
 ```bash
 # From GitHub
-claude plugin install https://github.com/anthropics/autoloop/tree/main/plugins/claude-code
+claude plugin install https://github.com/yaoshengzhe/autoloop/tree/main/plugins/claude-code
 
 # From local clone
 claude plugin install ./plugins/claude-code
@@ -19,7 +19,7 @@ claude plugin install ./plugins/claude-code
 
 ```bash
 # Update to latest
-claude plugin install https://github.com/anthropics/autoloop/tree/main/plugins/claude-code --force
+claude plugin install https://github.com/yaoshengzhe/autoloop/tree/main/plugins/claude-code --force
 
 # Remove
 claude plugin uninstall autoloop

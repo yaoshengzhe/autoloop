@@ -21,7 +21,7 @@ Autoloop changes this dynamic:
 
 ```bash
 # From GitHub
-claude plugin install https://github.com/anthropics/autoloop/tree/main/plugins/claude-code
+claude plugin install https://github.com/yaoshengzhe/autoloop/tree/main/plugins/claude-code
 
 # From local clone
 claude plugin install ./plugins/claude-code
@@ -87,10 +87,10 @@ Each iteration builds on the last. The agent reviews what it built, identifies g
 
 ```bash
 # Install
-claude plugin install https://github.com/anthropics/autoloop/tree/main/plugins/claude-code
+claude plugin install https://github.com/yaoshengzhe/autoloop/tree/main/plugins/claude-code
 
 # Update (reinstall latest)
-claude plugin install https://github.com/anthropics/autoloop/tree/main/plugins/claude-code --force
+claude plugin install https://github.com/yaoshengzhe/autoloop/tree/main/plugins/claude-code --force
 
 # Uninstall
 claude plugin uninstall autoloop

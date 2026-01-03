@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Autonomous iterative loop for Claude Code - keeps working until the task is done",
   "author": "Shengzhe",
-  "repository": "https://github.com/shengzhe/autoloop",
+  "repository": "https://github.com/yaoshengzhe/autoloop",
   "commands": [
     {
       "name": "autoloop",
