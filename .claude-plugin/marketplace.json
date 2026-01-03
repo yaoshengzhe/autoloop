@@ -1,0 +1,14 @@
+{
+  "name": "autoloop",
+  "owner": {
+    "name": "Shengzhe"
+  },
+  "plugins": [
+    {
+      "name": "autoloop",
+      "source": "./plugins/claude-code",
+      "description": "Autonomous iterative loop for Claude Code - keeps working until the task is done",
+      "version": "0.1.0"
+    }
+  ]
+}

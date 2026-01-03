@@ -5,10 +5,13 @@ Transform Claude Code into an autonomous coding agent that works until your task
 ## Installation
 
 ```bash
-# From GitHub
-claude plugin install https://github.com/yaoshengzhe/autoloop/tree/main/plugins/claude-code
+# Add the marketplace (one-time setup)
+claude plugin marketplace add yaoshengzhe/autoloop
 
-# From local clone
+# Install the plugin
+claude plugin install autoloop@yaoshengzhe-autoloop
+
+# Or install from local clone
 claude plugin install ./plugins/claude-code
 
 # Verify
@@ -19,7 +22,7 @@ claude plugin install ./plugins/claude-code
 
 ```bash
 # Update to latest
-claude plugin install https://github.com/yaoshengzhe/autoloop/tree/main/plugins/claude-code --force
+claude plugin install autoloop@yaoshengzhe-autoloop --force
 
 # Remove
 claude plugin uninstall autoloop

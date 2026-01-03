@@ -20,10 +20,13 @@ Autoloop changes this dynamic:
 ### 1. Install
 
 ```bash
-# From GitHub
-claude plugin install https://github.com/yaoshengzhe/autoloop/tree/main/plugins/claude-code
+# Add the marketplace (one-time setup)
+claude plugin marketplace add yaoshengzhe/autoloop
 
-# From local clone
+# Install the plugin
+claude plugin install autoloop@yaoshengzhe-autoloop
+
+# Or install from local clone
 claude plugin install ./plugins/claude-code
 ```
 
@@ -86,11 +89,14 @@ Each iteration builds on the last. The agent reviews what it built, identifies g
 ## Plugin Management
 
 ```bash
+# Add marketplace (one-time)
+claude plugin marketplace add yaoshengzhe/autoloop
+
 # Install
-claude plugin install https://github.com/yaoshengzhe/autoloop/tree/main/plugins/claude-code
+claude plugin install autoloop@yaoshengzhe-autoloop
 
 # Update (reinstall latest)
-claude plugin install https://github.com/yaoshengzhe/autoloop/tree/main/plugins/claude-code --force
+claude plugin install autoloop@yaoshengzhe-autoloop --force
 
 # Uninstall
 claude plugin uninstall autoloop
