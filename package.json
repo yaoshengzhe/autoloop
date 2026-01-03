@@ -1,0 +1,27 @@
+{
+  "name": "autoloop",
+  "version": "0.1.0",
+  "description": "Autonomous iterative loop framework for AI agents",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./core": "./src/core/index.js",
+    "./adapters/claude-code": "./src/adapters/claude-code/index.js"
+  },
+  "scripts": {
+    "test": "node --test src/**/*.test.js"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "loop",
+    "claude",
+    "automation"
+  ],
+  "author": "Shengzhe",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
