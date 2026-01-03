@@ -8,6 +8,7 @@ Autoloop is an autonomous iterative loop framework for Claude Code.
 |---------|-------------|
 | `/autoloop "<prompt>" [options]` | Start an iterative loop |
 | `/cancel-autoloop` | Cancel the active loop |
+| `/autoloop-status` | Check current loop status |
 | `/autoloop-help` | Show this help |
 
 ## Options for /autoloop

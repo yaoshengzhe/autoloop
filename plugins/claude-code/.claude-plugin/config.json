@@ -19,6 +19,11 @@
       "name": "autoloop-help",
       "description": "Show autoloop usage and documentation",
       "file": "../commands/autoloop-help.md"
+    },
+    {
+      "name": "autoloop-status",
+      "description": "Check the status of the current autoloop",
+      "file": "../commands/autoloop-status.md"
     }
   ],
   "hooks": {
