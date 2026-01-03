@@ -92,6 +92,17 @@ export class ClaudeCodeAdapter {
   }
 
   /**
+   * Escape a string for safe YAML output
+   * @param {string} str
+   * @returns {string}
+   */
+  escapeYamlString(str) {
+    if (!str) return '';
+    // Escape backslashes and double quotes
+    return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  }
+
+  /**
    * Write loop state to file with YAML frontmatter
    * @param {LoopState} state
    */
@@ -100,7 +111,7 @@ export class ClaudeCodeAdapter {
     const data = state.toJSON ? state.toJSON() : state;
 
     const completionPromise = data.completionPromise
-      ? `"${data.completionPromise}"`
+      ? `"${this.escapeYamlString(data.completionPromise)}"`
       : 'null';
 
     const md = `---
