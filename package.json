@@ -4,6 +4,7 @@
   "description": "Autonomous iterative loop framework for AI agents",
   "type": "module",
   "main": "src/index.js",
+  "types": "src/types.d.ts",
   "exports": {
     ".": "./src/index.js",
     "./core": "./src/core/index.js",
