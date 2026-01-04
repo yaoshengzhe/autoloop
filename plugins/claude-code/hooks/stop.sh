@@ -22,7 +22,11 @@ MAX_ITERATIONS=$(parse_yaml_value "max_iterations")
 COMPLETION_PROMISE=$(parse_yaml_value "completion_promise")
 
 # Extract prompt (content after frontmatter)
-PROMPT=$(sed -n '/^---$/,/^---$/d; p' "$STATE_FILE" | sed '/^$/d')
+# Find the line number of the closing --- of YAML frontmatter (second occurrence)
+FRONTMATTER_END=$(awk '/^---$/ { count++; if (count == 2) { print NR; exit } }' "$STATE_FILE")
+# Get everything after the frontmatter, preserving internal --- separators
+# Trim leading blank lines to prevent accumulation across iterations
+PROMPT=$(tail -n +$((FRONTMATTER_END + 1)) "$STATE_FILE" | sed '/./,$!d')
 
 # Exit if not active
 if [[ "$ACTIVE" != "true" ]]; then
