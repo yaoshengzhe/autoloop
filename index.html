@@ -3,168 +3,759 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Autoloop - Autonomous AI Coding Agent</title>
-  <meta name="description" content="Let your AI agent work autonomously until the job is done. Walk away from your keyboard, return to working code.">
+  <title>Autoloop - Autonomous AI Coding Agent for Claude Code</title>
+  <meta name="description" content="Let your AI agent work autonomously until the job is done. Walk away from your keyboard, return to working code. The first autonomous loop plugin for Claude Code.">
 
   <!-- Open Graph -->
   <meta property="og:title" content="Autoloop - Autonomous AI Coding Agent">
   <meta property="og:description" content="Let your AI agent work autonomously until the job is done. Walk away from your keyboard, return to working code.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://yaoshengzhe.github.io/autoloop/">
+  <meta property="og:image" content="https://yaoshengzhe.github.io/autoloop/og-image.png">
 
   <!-- Twitter -->
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Autoloop - Autonomous AI Coding Agent">
   <meta name="twitter:description" content="Let your AI agent work autonomously until the job is done.">
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔄</text></svg>">
+
   <style>
     :root {
       --bg: #0d1117;
+      --bg-secondary: #161b22;
       --text: #c9d1d9;
+      --text-muted: #8b949e;
       --accent: #58a6ff;
+      --accent-glow: rgba(88, 166, 255, 0.4);
+      --success: #3fb950;
+      --warning: #d29922;
       --code-bg: #161b22;
       --border: #30363d;
+      --gradient-1: #58a6ff;
+      --gradient-2: #a371f7;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
+      overflow-x: hidden;
     }
-    .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
 
-    header { text-align: center; padding: 4rem 0 3rem; }
-    h1 { font-size: 3rem; margin-bottom: 1rem; color: #fff; }
-    .tagline { font-size: 1.4rem; color: var(--accent); margin-bottom: 0.5rem; }
-    .subtitle { font-size: 1.1rem; opacity: 0.8; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
 
-    .install {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin: 3rem 0;
+    /* Animated background */
+    .bg-glow {
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 30%, rgba(88, 166, 255, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 70%, rgba(163, 113, 247, 0.06) 0%, transparent 50%);
+      animation: bgPulse 15s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
     }
-    .install h2 { font-size: 1rem; margin-bottom: 1rem; color: var(--accent); }
-    pre {
-      background: var(--bg);
-      padding: 1rem;
-      border-radius: 6px;
-      overflow-x: auto;
-      font-size: 0.9rem;
-    }
-    code { font-family: 'SF Mono', Monaco, 'Courier New', monospace; }
 
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin: 3rem 0;
+    @keyframes bgPulse {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-5%, -5%) scale(1.1); }
     }
-    .feature {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
-    }
-    .feature h3 { color: #fff; margin-bottom: 0.5rem; }
 
-    .example {
-      margin: 3rem 0;
-    }
-    .example h2 { margin-bottom: 1rem; }
-
-    .cta {
+    /* Hero Section */
+    header {
       text-align: center;
-      padding: 3rem 0;
+      padding: 6rem 0 4rem;
+      position: relative;
     }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      animation: spin 8s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: clamp(1.2rem, 3vw, 1.6rem);
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .subtitle {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    /* Buttons */
     .btn {
-      display: inline-block;
-      background: var(--accent);
-      color: var(--bg);
-      padding: 0.8rem 2rem;
-      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      border-radius: 8px;
       text-decoration: none;
       font-weight: 600;
-      margin: 0.5rem;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
     }
-    .btn:hover { opacity: 0.9; }
-    .btn:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+      color: #fff;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px var(--accent-glow);
+    }
+
     .btn-outline {
       background: transparent;
-      border: 1px solid var(--accent);
+      border: 2px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(88, 166, 255, 0.1);
+    }
+
+    .btn:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Install Section */
+    .install {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 4rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .install::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2));
+    }
+
+    .install h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    pre {
+      background: var(--bg);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+    }
+
+    code {
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Courier New', monospace;
+    }
+
+    .code-comment { color: var(--text-muted); }
+    .code-command { color: var(--success); }
+    .code-flag { color: var(--warning); }
+
+    /* How It Works Section */
+    .how-it-works {
+      padding: 4rem 0;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .step {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      position: relative;
+      padding-bottom: 2rem;
+    }
+
+    .step:last-child { padding-bottom: 0; }
+
+    .step-number {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step:not(:last-child) .step-number::after {
+      content: '';
+      position: absolute;
+      top: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: calc(100% + 1rem);
+      background: linear-gradient(180deg, var(--accent), transparent);
+    }
+
+    .step-content h3 {
+      color: #fff;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-content p {
+      color: var(--text-muted);
+    }
+
+    /* Features Grid */
+    .features {
+      padding: 4rem 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .feature:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
       color: var(--accent);
     }
-    .btn-outline:hover { background: rgba(88, 166, 255, 0.1); }
 
+    .feature h3 {
+      color: #fff;
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .feature p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Use Cases */
+    .use-cases {
+      padding: 4rem 0;
+    }
+
+    .use-case-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .use-case {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .use-case:hover {
+      border-color: var(--accent);
+    }
+
+    .use-case-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .use-case-icon {
+      font-size: 1.5rem;
+    }
+
+    .use-case h3 {
+      color: #fff;
+      font-size: 1.1rem;
+    }
+
+    .use-case pre {
+      font-size: 0.8rem;
+      margin: 0;
+    }
+
+    /* Example Section */
+    .example {
+      padding: 4rem 0;
+    }
+
+    .example-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .example-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red { background: #ff5f56; }
+    .terminal-dot.yellow { background: #ffbd2e; }
+    .terminal-dot.green { background: #27c93f; }
+
+    .example-content {
+      padding: 1.5rem;
+    }
+
+    .example-content pre {
+      border: none;
+      background: transparent;
+      padding: 0;
+    }
+
+    /* CTA Section */
+    .cta {
+      text-align: center;
+      padding: 5rem 0 4rem;
+    }
+
+    .cta h2 {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .cta p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Footer */
     footer {
       text-align: center;
-      padding: 2rem 0;
+      padding: 3rem 0;
       border-top: 1px solid var(--border);
-      margin-top: 3rem;
-      opacity: 0.7;
+      margin-top: 2rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    .footer-copyright {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Scroll Animations */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { padding: 1.5rem; }
+      header { padding: 4rem 0 3rem; }
+      .logo { width: 60px; height: 60px; }
+      .hero-cta { flex-direction: column; align-items: center; }
+      .btn { width: 100%; max-width: 300px; justify-content: center; }
+      .step { gap: 1rem; }
+      .step-number { width: 40px; height: 40px; font-size: 1rem; }
+      .cta-buttons { flex-direction: column; align-items: center; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      html { scroll-behavior: auto; }
     }
   </style>
 </head>
 <body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
   <div class="container">
     <header>
+      <div class="logo-container">
+        <svg class="logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="50" cy="50" r="45" stroke="url(#gradient)" stroke-width="6" fill="none"/>
+          <path d="M65 35 L75 50 L65 65" stroke="url(#gradient)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M35 65 L25 50 L35 35" stroke="url(#gradient)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#58a6ff"/>
+              <stop offset="100%" stop-color="#a371f7"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
       <h1>Autoloop</h1>
-      <p class="tagline">Let your AI agent work autonomously until the job is done.</p>
-      <p class="subtitle">Walk away from your keyboard. Return to working code.</p>
+      <p class="tagline">Autonomous AI coding that doesn't stop until it's done.</p>
+      <p class="subtitle">Give Claude Code a task with a completion promise. Walk away. Return to working code.</p>
+      <div class="hero-cta">
+        <a href="#install" class="btn btn-primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Get Started
+        </a>
+        <a href="https://github.com/yaoshengzhe/autoloop" class="btn btn-outline">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+      </div>
     </header>
 
-    <div class="install">
-      <h2>Quick Start</h2>
-      <pre><code># Install
-claude plugin marketplace add yaoshengzhe/autoloop
-claude plugin install autoloop@autoloop
+    <section id="install" class="install fade-in">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        Quick Start
+      </h2>
+      <pre><code><span class="code-comment"># Install the plugin</span>
+<span class="code-command">claude plugin marketplace add</span> yaoshengzhe/autoloop
+<span class="code-command">claude plugin install</span> autoloop@autoloop
 
-# Run
-/autoloop Build a REST API with tests --completion-promise 'DONE' --max-iterations 15</code></pre>
-    </div>
+<span class="code-comment"># Start an autonomous loop</span>
+<span class="code-command">/autoloop</span> Build a REST API with tests <span class="code-flag">--completion-promise</span> <span class="code-string">'DONE'</span> <span class="code-flag">--max-iterations</span> 15</code></pre>
+    </section>
 
-    <div class="features">
-      <div class="feature">
-        <h3>Autonomous</h3>
-        <p>Define your goal and let the agent work independently through iterations.</p>
+    <section class="how-it-works fade-in">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-subtitle">Autoloop transforms Claude Code into an autonomous agent that iterates until your task is complete.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Define Your Task</h3>
+            <p>Give Claude Code a detailed prompt with clear deliverables and a completion promise that signals when the work is done.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Agent Works Autonomously</h3>
+            <p>The agent writes code, runs tests, fixes issues, and commits progress. Each iteration builds on the previous work.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Loop Continues Until Done</h3>
+            <p>A stop hook intercepts exit attempts. If the promise isn't fulfilled, the agent continues with fresh context from files and git history.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Review the Results</h3>
+            <p>When the promise is fulfilled (or max iterations reached), you get working code with a full git history of every decision.</p>
+          </div>
+        </div>
       </div>
-      <div class="feature">
-        <h3>Self-Correcting</h3>
-        <p>Each iteration builds on the last. The agent sees its work and fixes issues.</p>
-      </div>
-      <div class="feature">
-        <h3>Safe</h3>
-        <p>Max iterations prevent runaway loops. You stay in control.</p>
-      </div>
-      <div class="feature">
-        <h3>Transparent</h3>
-        <p>All work preserved in files and git history for your review.</p>
-      </div>
-    </div>
+    </section>
 
-    <div class="example">
-      <h2>Example</h2>
-      <pre><code>/autoloop "Build user authentication:
-- Login/logout endpoints
-- JWT tokens
-- Unit tests with 80% coverage
+    <section class="features fade-in">
+      <h2 class="section-title">Why Autoloop?</h2>
+      <p class="section-subtitle">Built for developers who want AI that actually finishes the job.</p>
 
-Run tests after each change.
-&lt;promise&gt;AUTH COMPLETE&lt;/promise&gt;" --max-iterations 20</code></pre>
-    </div>
+      <div class="features-grid">
+        <div class="feature">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <h3>Autonomous</h3>
+          <p>Define your goal once. The agent works independently through as many iterations as needed, without waiting for your input.</p>
+        </div>
+        <div class="feature">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="9" y1="15" x2="15" y2="15"/>
+          </svg>
+          <h3>Self-Correcting</h3>
+          <p>Each iteration sees all previous work in files and git history. The agent learns from mistakes and fixes issues automatically.</p>
+        </div>
+        <div class="feature">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <h3>Safe</h3>
+          <p>Set max iterations to prevent runaway loops. The agent can only claim completion when the promise is genuinely fulfilled.</p>
+        </div>
+        <div class="feature">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <h3>Transparent</h3>
+          <p>Every action is preserved. Review the full git history, see each iteration's changes, and understand every decision made.</p>
+        </div>
+      </div>
+    </section>
 
-    <div class="cta">
-      <a href="https://github.com/yaoshengzhe/autoloop" class="btn">View on GitHub</a>
-      <a href="https://github.com/yaoshengzhe/autoloop#quick-start" class="btn btn-outline">Documentation</a>
-    </div>
+    <section class="use-cases fade-in">
+      <h2 class="section-title">What Can You Build?</h2>
+      <p class="section-subtitle">Autoloop handles complex, multi-step tasks that would normally require constant supervision.</p>
+
+      <div class="use-case-grid">
+        <div class="use-case">
+          <div class="use-case-header">
+            <span class="use-case-icon">🧪</span>
+            <h3>Test-Driven Development</h3>
+          </div>
+          <pre><code>/autoloop "Write tests first, then implement
+until all tests pass. Coverage > 80%"
+<span class="code-flag">--completion-promise</span> 'ALL TESTS PASS'</code></pre>
+        </div>
+        <div class="use-case">
+          <div class="use-case-header">
+            <span class="use-case-icon">🏗️</span>
+            <h3>Feature Implementation</h3>
+          </div>
+          <pre><code>/autoloop "Build user auth with JWT,
+login/logout, and password reset"
+<span class="code-flag">--completion-promise</span> 'AUTH COMPLETE'</code></pre>
+        </div>
+        <div class="use-case">
+          <div class="use-case-header">
+            <span class="use-case-icon">🐛</span>
+            <h3>Bug Fixing</h3>
+          </div>
+          <pre><code>/autoloop "Debug the payment flow.
+Find root cause, fix it, add tests"
+<span class="code-flag">--completion-promise</span> 'BUG FIXED'</code></pre>
+        </div>
+        <div class="use-case">
+          <div class="use-case-header">
+            <span class="use-case-icon">♻️</span>
+            <h3>Refactoring</h3>
+          </div>
+          <pre><code>/autoloop "Refactor to clean architecture.
+Keep all tests passing throughout"
+<span class="code-flag">--completion-promise</span> 'REFACTOR DONE'</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="example fade-in">
+      <h2 class="section-title">See It In Action</h2>
+      <p class="section-subtitle">A complete example with detailed task specification.</p>
+
+      <div class="example-container">
+        <div class="example-header">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+        </div>
+        <div class="example-content">
+          <pre><code><span class="code-command">/autoloop</span> "Build user authentication:
+
+<span class="code-comment"># Requirements</span>
+- Login/logout REST endpoints
+- JWT token generation and validation
+- Password hashing with bcrypt
+- Rate limiting on auth endpoints
+
+<span class="code-comment"># Verification</span>
+- Unit tests with 80%+ coverage
+- Integration tests for all endpoints
+- Run tests after each change
+
+<span class="code-comment"># Completion Signal</span>
+&lt;promise&gt;AUTH SYSTEM COMPLETE&lt;/promise&gt;"
+
+<span class="code-flag">--max-iterations</span> 25</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta fade-in">
+      <h2>Ready to let AI finish the job?</h2>
+      <p>Install Autoloop and start building with autonomous AI today.</p>
+      <div class="cta-buttons">
+        <a href="#install" class="btn btn-primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Install Now
+        </a>
+        <a href="https://github.com/yaoshengzhe/autoloop#quick-start" class="btn btn-outline">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          Read the Docs
+        </a>
+      </div>
+    </section>
 
     <footer>
-      <p>MIT License &copy; Shengzhe</p>
+      <div class="footer-links">
+        <a href="https://github.com/yaoshengzhe/autoloop">GitHub</a>
+        <a href="https://github.com/yaoshengzhe/autoloop#quick-start">Documentation</a>
+        <a href="https://github.com/yaoshengzhe/autoloop/issues">Issues</a>
+        <a href="https://github.com/yaoshengzhe/autoloop/blob/main/LICENSE">MIT License</a>
+      </div>
+      <p class="footer-copyright">&copy; 2024 Shengzhe. Built for Claude Code.</p>
     </footer>
   </div>
+
+  <script>
+    // Scroll animations
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
 </body>
 </html>
