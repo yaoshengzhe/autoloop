@@ -5,7 +5,7 @@ Cancel the currently active autoloop.
 ## Usage
 
 ```
-/cancel-autoloop
+/autoloop:cancel-autoloop
 ```
 
 This command stops the iterative loop immediately. Use when:

@@ -14,7 +14,7 @@ claude plugin install autoloop@autoloop
 
 ```bash
 # Run
-/autoloop Build a REST API with tests --completion-promise 'DONE' --max-iterations 15
+/autoloop:autoloop Build a REST API with tests --completion-promise 'DONE' --max-iterations 15
 ```
 
 The agent iterates on your task, committing progress along the way. When complete, it outputs `<promise>DONE</promise>` and exits.
@@ -33,7 +33,7 @@ Autoloop breaks this cycle:
 ## Example
 
 ```bash
-/autoloop "Build user authentication:
+/autoloop:autoloop "Build user authentication:
 - Login/logout endpoints
 - JWT tokens
 - Unit tests with 80% coverage
@@ -46,9 +46,9 @@ Run tests after each change.
 
 | Command | Purpose |
 |---------|---------|
-| `/autoloop <task> [options]` | Start autonomous loop |
-| `/cancel-autoloop` | Stop the loop |
-| `/autoloop-status` | Check progress |
+| `/autoloop:autoloop <task> [options]` | Start autonomous loop |
+| `/autoloop:cancel-autoloop` | Stop the loop |
+| `/autoloop:autoloop-status` | Check progress |
 
 ## Options
 

@@ -76,11 +76,30 @@ started_at: "$STARTED_AT"
 $PROMPT
 EOF
 
-# Output continuation message
+# Calculate elapsed time for progress log
+STARTED_AT=$(parse_yaml_value "started_at")
+ELAPSED_STR="unknown"
+if [[ -n "$STARTED_AT" ]]; then
+  START_EPOCH=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$STARTED_AT" "+%s" 2>/dev/null || date -d "$STARTED_AT" "+%s" 2>/dev/null || echo "0")
+  if [[ "$START_EPOCH" != "0" ]]; then
+    NOW_EPOCH=$(date "+%s")
+    ELAPSED=$((NOW_EPOCH - START_EPOCH))
+    ELAPSED_MIN=$((ELAPSED / 60))
+    ELAPSED_SEC=$((ELAPSED % 60))
+    ELAPSED_STR="${ELAPSED_MIN}m ${ELAPSED_SEC}s"
+  fi
+fi
+
+# Output continuation message with progress log
 echo ""
 echo "═══════════════════════════════════════════════════════════"
-echo "AUTOLOOP ITERATION $NEXT_ITERATION$(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo "/$MAX_ITERATIONS"; fi)"
+echo "AUTOLOOP - Iteration $NEXT_ITERATION$(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo " of $MAX_ITERATIONS"; fi)"
 echo "═══════════════════════════════════════════════════════════"
+echo ""
+echo "Progress:"
+echo "  • Iteration:     $ITERATION → $NEXT_ITERATION"
+echo "  • Elapsed time:  $ELAPSED_STR"
+echo "  • Status:        Active - continuing work"
 echo ""
 echo "Continue working on the task. Previous work is preserved."
 echo ""

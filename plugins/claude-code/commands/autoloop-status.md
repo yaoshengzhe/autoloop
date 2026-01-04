@@ -5,7 +5,7 @@ Check the status of the current autoloop.
 ## Usage
 
 ```
-/autoloop-status
+/autoloop:autoloop-status
 ```
 
 Displays:

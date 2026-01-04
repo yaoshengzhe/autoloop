@@ -16,7 +16,7 @@ while [[ $# -gt 0 ]]; do
 Autoloop - Autonomous iterative loop for Claude Code
 
 USAGE:
-  /autoloop [PROMPT...] [OPTIONS]
+  /autoloop:autoloop [PROMPT...] [OPTIONS]
 
 ARGUMENTS:
   PROMPT...    Task description (can be multiple words without quotes)
@@ -33,9 +33,9 @@ DESCRIPTION:
   To signal completion, output: <promise>YOUR_PHRASE</promise>
 
 EXAMPLES:
-  /autoloop Build a REST API --completion-promise 'DONE' --max-iterations 20
-  /autoloop Fix the auth bug --max-iterations 10
-  /autoloop --completion-promise 'ALL TESTS PASS' Refactor the cache layer
+  /autoloop:autoloop Build a REST API --completion-promise 'DONE' --max-iterations 20
+  /autoloop:autoloop Fix the auth bug --max-iterations 10
+  /autoloop:autoloop --completion-promise 'ALL TESTS PASS' Refactor the cache layer
 
 COMMON PROMPT FILE:
   Create .claude/autoloop-prompt.md with common instructions that apply to all loops.
@@ -44,7 +44,7 @@ COMMON PROMPT FILE:
 STOPPING:
   - Reaching --max-iterations limit
   - Outputting <promise>COMPLETION_TEXT</promise>
-  - Running /cancel-autoloop
+  - Running /autoloop:cancel-autoloop
 
 MONITORING:
   head -10 .claude/autoloop.local.md
@@ -94,10 +94,16 @@ done
 # Join prompt parts
 PROMPT="${PROMPT_PARTS[*]:-}"
 
-# Load common prompt file if exists
+# Load common prompt file if exists (check both current directory and plugin directory)
 COMMON_PROMPT=""
+COMMON_PROMPT_SOURCE=""
 if [[ -f "$COMMON_PROMPT_FILE" ]]; then
   COMMON_PROMPT=$(cat "$COMMON_PROMPT_FILE")
+  COMMON_PROMPT_SOURCE="$COMMON_PROMPT_FILE"
+elif [[ -n "${PLUGIN_DIR:-}" ]] && [[ -f "$PLUGIN_DIR/../../../.claude/autoloop-prompt.md" ]]; then
+  # Fall back to repo root relative to plugin directory
+  COMMON_PROMPT=$(cat "$PLUGIN_DIR/../../../.claude/autoloop-prompt.md")
+  COMMON_PROMPT_SOURCE="$PLUGIN_DIR/../../../.claude/autoloop-prompt.md"
 fi
 
 # Validate prompt
@@ -105,10 +111,10 @@ if [[ -z "$PROMPT" ]]; then
   echo "Error: No prompt provided" >&2
   echo "" >&2
   echo "Examples:" >&2
-  echo "  /autoloop Build a REST API --completion-promise 'DONE'" >&2
-  echo "  /autoloop Fix bug in auth module --max-iterations 10" >&2
+  echo "  /autoloop:autoloop Build a REST API --completion-promise 'DONE'" >&2
+  echo "  /autoloop:autoloop Fix bug in auth module --max-iterations 10" >&2
   echo "" >&2
-  echo "For help: /autoloop --help" >&2
+  echo "For help: /autoloop:autoloop --help" >&2
   exit 1
 fi
 
@@ -147,20 +153,23 @@ started_at: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 $FULL_PROMPT
 EOF
 
-# Output setup message
-cat <<EOF
-
-Autoloop activated!
-
-Iteration: 1
-Max iterations: $(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo $MAX_ITERATIONS; else echo "unlimited"; fi)
-Completion promise: $(if [[ "$COMPLETION_PROMISE" != "null" ]]; then echo "$COMPLETION_PROMISE"; else echo "none"; fi)
-Common prompt: $(if [[ -n "$COMMON_PROMPT" ]]; then echo "loaded from $COMMON_PROMPT_FILE"; else echo "none"; fi)
-
-The stop hook will feed this prompt back when you try to exit.
-Your previous work persists in files and git history.
-
-EOF
+# Output setup message with working log
+echo ""
+echo "═══════════════════════════════════════════════════════════"
+echo "AUTOLOOP - Started"
+echo "═══════════════════════════════════════════════════════════"
+echo ""
+echo "Configuration:"
+echo "  • Iteration:     1$(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo " of $MAX_ITERATIONS"; fi)"
+echo "  • Max iterations: $(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo $MAX_ITERATIONS; else echo "unlimited"; fi)"
+echo "  • Promise:       $(if [[ "$COMPLETION_PROMISE" != "null" ]]; then echo "$COMPLETION_PROMISE"; else echo "none"; fi)"
+echo "  • Common prompt: $(if [[ -n "$COMMON_PROMPT" ]]; then echo "loaded from $COMMON_PROMPT_SOURCE"; else echo "not found (create .claude/autoloop-prompt.md)"; fi)"
+echo ""
+echo "The stop hook will feed this prompt back when you try to exit."
+echo "Your previous work persists in files and git history."
+echo ""
+echo "═══════════════════════════════════════════════════════════"
+echo ""
 
 # Output the full prompt
 echo "$FULL_PROMPT"

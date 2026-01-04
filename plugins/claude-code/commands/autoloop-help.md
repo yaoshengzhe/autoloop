@@ -6,14 +6,14 @@ Autoloop lets Claude Code work autonomously until your task is complete.
 
 | Command | Purpose |
 |---------|---------|
-| `/autoloop <task> [options]` | Start autonomous loop |
-| `/cancel-autoloop` | Stop the loop |
-| `/autoloop-status` | Check progress |
+| `/autoloop:autoloop <task> [options]` | Start autonomous loop |
+| `/autoloop:cancel-autoloop` | Stop the loop |
+| `/autoloop:autoloop-status` | Check progress |
 
 ## Usage
 
 ```bash
-/autoloop <task> --completion-promise '<signal>' --max-iterations <n>
+/autoloop:autoloop <task> --completion-promise '<signal>' --max-iterations <n>
 ```
 
 When done, output `<promise>SIGNAL</promise>` to complete the loop.
@@ -21,7 +21,7 @@ When done, output `<promise>SIGNAL</promise>` to complete the loop.
 ## Example
 
 ```bash
-/autoloop "Build password reset with tests. Run tests after each change.
+/autoloop:autoloop "Build password reset with tests. Run tests after each change.
 <promise>DONE</promise>" --max-iterations 15
 ```
 
