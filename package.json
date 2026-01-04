@@ -1,7 +1,7 @@
 {
   "name": "autoloop",
   "version": "0.1.0",
-  "description": "Autonomous iterative loop framework for AI agents",
+  "description": "Let your AI agent work autonomously until the job is done",
   "type": "module",
   "main": "src/index.js",
   "types": "src/types.d.ts",
@@ -16,12 +16,20 @@
   "keywords": [
     "ai",
     "agent",
-    "loop",
+    "autonomous",
     "claude",
-    "automation"
+    "claude-code",
+    "automation",
+    "loop",
+    "iterative"
   ],
   "author": "Shengzhe",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yaoshengzhe/autoloop"
+  },
+  "homepage": "https://github.com/yaoshengzhe/autoloop#readme",
   "engines": {
     "node": ">=18.0.0"
   }
