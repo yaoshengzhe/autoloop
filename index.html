@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autoloop - Autonomous AI Coding Agent</title>
+  <meta name="description" content="Let your AI agent work autonomously until the job is done. Walk away from your keyboard, return to working code.">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --text: #c9d1d9;
+      --accent: #58a6ff;
+      --code-bg: #161b22;
+      --border: #30363d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+
+    header { text-align: center; padding: 4rem 0 3rem; }
+    h1 { font-size: 3rem; margin-bottom: 1rem; color: #fff; }
+    .tagline { font-size: 1.4rem; color: var(--accent); margin-bottom: 0.5rem; }
+    .subtitle { font-size: 1.1rem; opacity: 0.8; }
+
+    .install {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 3rem 0;
+    }
+    .install h2 { font-size: 1rem; margin-bottom: 1rem; color: var(--accent); }
+    pre {
+      background: var(--bg);
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+    }
+    code { font-family: 'SF Mono', Monaco, 'Courier New', monospace; }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin: 3rem 0;
+    }
+    .feature {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    .feature h3 { color: #fff; margin-bottom: 0.5rem; }
+
+    .example {
+      margin: 3rem 0;
+    }
+    .example h2 { margin-bottom: 1rem; }
+
+    .cta {
+      text-align: center;
+      padding: 3rem 0;
+    }
+    .btn {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 0.8rem 2rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0.5rem;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Autoloop</h1>
+      <p class="tagline">Let your AI agent work autonomously until the job is done.</p>
+      <p class="subtitle">Walk away from your keyboard. Return to working code.</p>
+    </header>
+
+    <div class="install">
+      <h2>Quick Start</h2>
+      <pre><code># Install
+claude plugin marketplace add yaoshengzhe/autoloop
+claude plugin install autoloop@autoloop
+
+# Run
+/autoloop Build a REST API with tests --completion-promise 'DONE' --max-iterations 15</code></pre>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <h3>Autonomous</h3>
+        <p>Define your goal and let the agent work independently through iterations.</p>
+      </div>
+      <div class="feature">
+        <h3>Self-Correcting</h3>
+        <p>Each iteration builds on the last. The agent sees its work and fixes issues.</p>
+      </div>
+      <div class="feature">
+        <h3>Safe</h3>
+        <p>Max iterations prevent runaway loops. You stay in control.</p>
+      </div>
+      <div class="feature">
+        <h3>Transparent</h3>
+        <p>All work preserved in files and git history for your review.</p>
+      </div>
+    </div>
+
+    <div class="example">
+      <h2>Example</h2>
+      <pre><code>/autoloop "Build user authentication:
+- Login/logout endpoints
+- JWT tokens
+- Unit tests with 80% coverage
+
+Run tests after each change.
+&lt;promise&gt;AUTH COMPLETE&lt;/promise&gt;" --max-iterations 20</code></pre>
+    </div>
+
+    <div class="cta">
+      <a href="https://github.com/yaoshengzhe/autoloop" class="btn">View on GitHub</a>
+      <a href="https://github.com/yaoshengzhe/autoloop#quick-start" class="btn btn-outline">Documentation</a>
+    </div>
+
+    <footer>
+      <p>MIT License &copy; Shengzhe</p>
+    </footer>
+  </div>
+</body>
+</html>
