@@ -219,6 +219,7 @@
     .code-comment { color: var(--text-muted); }
     .code-command { color: var(--success); }
     .code-flag { color: var(--warning); }
+    .code-string { color: #a5d6ff; }
 
     /* How It Works Section */
     .how-it-works {
@@ -555,11 +556,10 @@
         Quick Start
       </h2>
       <pre><code><span class="code-comment"># Install the plugin</span>
-<span class="code-command">claude plugin marketplace add</span> yaoshengzhe/autoloop
-<span class="code-command">claude plugin install</span> autoloop@autoloop
+<span class="code-command">claude plugin marketplace add</span> yaoshengzhe/autoloop && <span class="code-command">claude plugin install</span> autoloop@autoloop
 
 <span class="code-comment"># Start an autonomous loop</span>
-<span class="code-command">/autoloop</span> Build a REST API with tests <span class="code-flag">--completion-promise</span> <span class="code-string">'DONE'</span> <span class="code-flag">--max-iterations</span> 15</code></pre>
+<span class="code-command">/autoloop:autoloop</span> Build a REST API with tests <span class="code-flag">--completion-promise</span> <span class="code-string">'DONE'</span> <span class="code-flag">--max-iterations</span> 15</code></pre>
     </section>
 
     <section class="how-it-works fade-in">
@@ -648,36 +648,36 @@
             <span class="use-case-icon">🧪</span>
             <h3>Test-Driven Development</h3>
           </div>
-          <pre><code>/autoloop "Write tests first, then implement
-until all tests pass. Coverage > 80%"
-<span class="code-flag">--completion-promise</span> 'ALL TESTS PASS'</code></pre>
+          <pre><code><span class="code-command">/autoloop:autoloop</span> <span class="code-string">"Write tests first, then implement
+until all tests pass. Coverage > 80%"</span>
+<span class="code-flag">--completion-promise</span> <span class="code-string">'ALL TESTS PASS'</span></code></pre>
         </div>
         <div class="use-case">
           <div class="use-case-header">
             <span class="use-case-icon">🏗️</span>
             <h3>Feature Implementation</h3>
           </div>
-          <pre><code>/autoloop "Build user auth with JWT,
-login/logout, and password reset"
-<span class="code-flag">--completion-promise</span> 'AUTH COMPLETE'</code></pre>
+          <pre><code><span class="code-command">/autoloop:autoloop</span> <span class="code-string">"Build user auth with JWT,
+login/logout, and password reset"</span>
+<span class="code-flag">--completion-promise</span> <span class="code-string">'AUTH COMPLETE'</span></code></pre>
         </div>
         <div class="use-case">
           <div class="use-case-header">
             <span class="use-case-icon">🐛</span>
             <h3>Bug Fixing</h3>
           </div>
-          <pre><code>/autoloop "Debug the payment flow.
-Find root cause, fix it, add tests"
-<span class="code-flag">--completion-promise</span> 'BUG FIXED'</code></pre>
+          <pre><code><span class="code-command">/autoloop:autoloop</span> <span class="code-string">"Debug the payment flow.
+Find root cause, fix it, add tests"</span>
+<span class="code-flag">--completion-promise</span> <span class="code-string">'BUG FIXED'</span></code></pre>
         </div>
         <div class="use-case">
           <div class="use-case-header">
             <span class="use-case-icon">♻️</span>
             <h3>Refactoring</h3>
           </div>
-          <pre><code>/autoloop "Refactor to clean architecture.
-Keep all tests passing throughout"
-<span class="code-flag">--completion-promise</span> 'REFACTOR DONE'</code></pre>
+          <pre><code><span class="code-command">/autoloop:autoloop</span> <span class="code-string">"Refactor to clean architecture.
+Keep all tests passing throughout"</span>
+<span class="code-flag">--completion-promise</span> <span class="code-string">'REFACTOR DONE'</span></code></pre>
         </div>
       </div>
     </section>
@@ -693,7 +693,7 @@ Keep all tests passing throughout"
           <span class="terminal-dot green"></span>
         </div>
         <div class="example-content">
-          <pre><code><span class="code-command">/autoloop</span> "Build user authentication:
+          <pre><code><span class="code-command">/autoloop:autoloop</span> <span class="code-string">"Build user authentication:
 
 <span class="code-comment"># Requirements</span>
 - Login/logout REST endpoints
@@ -707,7 +707,7 @@ Keep all tests passing throughout"
 - Run tests after each change
 
 <span class="code-comment"># Completion Signal</span>
-&lt;promise&gt;AUTH SYSTEM COMPLETE&lt;/promise&gt;"
+&lt;promise&gt;AUTH SYSTEM COMPLETE&lt;/promise&gt;"</span>
 
 <span class="code-flag">--max-iterations</span> 25</code></pre>
         </div>
