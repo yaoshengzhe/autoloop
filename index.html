@@ -733,7 +733,7 @@ Keep all tests passing throughout"
         <a href="https://github.com/yaoshengzhe/autoloop/issues">Issues</a>
         <a href="https://github.com/yaoshengzhe/autoloop/blob/main/LICENSE">MIT License</a>
       </div>
-      <p class="footer-copyright">&copy; 2024 Shengzhe. Built for Claude Code.</p>
+      <p class="footer-copyright">&copy; <span id="year">2026</span> Shengzhe. Built for Claude Code.</p>
     </footer>
   </div>
 
@@ -756,6 +756,9 @@ Keep all tests passing throughout"
     document.querySelectorAll('.fade-in').forEach(el => {
       observer.observe(el);
     });
+
+    // Update copyright year dynamically
+    document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
