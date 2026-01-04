@@ -4,20 +4,23 @@
 
 Walk away from your keyboard. Return to working code.
 
-## Quick Start
+---
+
+## Install
 
 ```bash
-# Install (one-time)
-claude plugin marketplace add yaoshengzhe/autoloop
-claude plugin install autoloop@autoloop
+claude plugin marketplace add yaoshengzhe/autoloop && claude plugin install autoloop@autoloop
 ```
 
+## Run
+
 ```bash
-# Run
 /autoloop:autoloop Build a REST API with tests --completion-promise 'DONE' --max-iterations 15
 ```
 
 The agent iterates on your task, committing progress along the way. When complete, it outputs `<promise>DONE</promise>` and exits.
+
+---
 
 ## Why Autoloop?
 
@@ -25,10 +28,14 @@ Traditional AI assistants need constant hand-holding. Prompt, wait, review, prom
 
 Autoloop breaks this cycle:
 
-- **Autonomous execution** — Define your goal and let it work
-- **Self-correcting** — Each iteration builds on the last
-- **Safe** — Max iterations prevent runaway loops
-- **Transparent** — All work preserved in files and git
+| | |
+|---|---|
+| **Autonomous** | Define your goal and let it work |
+| **Self-correcting** | Each iteration builds on the last |
+| **Safe** | Max iterations prevent runaway loops |
+| **Transparent** | All work preserved in files and git |
+
+---
 
 ## Example
 
@@ -42,6 +49,8 @@ Run tests after each change.
 <promise>AUTH COMPLETE</promise>" --max-iterations 20
 ```
 
+---
+
 ## Commands
 
 | Command | Purpose |
@@ -52,22 +61,33 @@ Run tests after each change.
 
 ## Options
 
-- `--completion-promise <text>` — Text that signals completion
-- `--max-iterations <n>` — Safety limit (default: unlimited)
+| Option | Description |
+|--------|-------------|
+| `--completion-promise <text>` | Text that signals completion |
+| `--max-iterations <n>` | Safety limit (default: unlimited) |
+
+---
 
 ## Tips
 
-1. **Be specific** — Clear goals prevent endless loops
-2. **Set limits** — Always use `--max-iterations`
-3. **Verify work** — Include test steps in your prompt
-4. **Use commits** — Ask for commits at milestones
+- **Be specific** — Clear goals prevent endless loops
+- **Set limits** — Always use `--max-iterations`
+- **Verify work** — Include test steps in your prompt
+- **Use commits** — Ask for commits at milestones
+
+---
 
 ## Plugin Management
 
 ```bash
-claude plugin install autoloop@autoloop --force  # Update
-claude plugin uninstall autoloop                  # Remove
+claude plugin install autoloop@autoloop --force   # Update
 ```
+
+```bash
+claude plugin uninstall autoloop                  # Uninstall
+```
+
+---
 
 ## License
 

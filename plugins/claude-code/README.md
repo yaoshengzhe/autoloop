@@ -2,11 +2,12 @@
 
 Turn Claude Code into an autonomous agent that iterates until your task is complete.
 
-## Installation
+---
+
+## Install
 
 ```bash
-claude plugin marketplace add yaoshengzhe/autoloop
-claude plugin install autoloop@autoloop
+claude plugin marketplace add yaoshengzhe/autoloop && claude plugin install autoloop@autoloop
 ```
 
 ## Quick Start
@@ -17,6 +18,8 @@ claude plugin install autoloop@autoloop
 
 Claude will work autonomously, iterating until it can truthfully output `<promise>DONE</promise>`.
 
+---
+
 ## Commands
 
 | Command | Description |
@@ -25,7 +28,9 @@ Claude will work autonomously, iterating until it can truthfully output `<promis
 | `/autoloop:cancel-autoloop` | Stop immediately |
 | `/autoloop:autoloop-status` | Check progress |
 
-**Options:** `--completion-promise <text>` · `--max-iterations <n>` · `--help`
+**Options:** `--completion-promise <text>` | `--max-iterations <n>` | `--help`
+
+---
 
 ## Common Prompt File
 
@@ -38,9 +43,11 @@ Create `.claude/autoloop-prompt.md` with instructions that apply to all loops:
 - Follow existing code style
 ```
 
-This content is automatically prepended to every `/autoloop` prompt.
+This content is automatically prepended to every `/autoloop:autoloop` prompt.
 
-## Example Patterns
+---
+
+## Examples
 
 **TDD Loop:**
 ```bash
@@ -60,20 +67,24 @@ Commit after each milestone. <promise>COMPLETE</promise>" --max-iterations 20
 Verify with load test. <promise>FIXED</promise>" --max-iterations 10
 ```
 
+---
+
 ## Writing Good Prompts
 
-✅ **Good:** Specific deliverables + verification steps + clear completion signal
+**Good:** Specific deliverables + verification steps + clear completion signal
 
 ```bash
 /autoloop:autoloop "Build auth module with login/logout, JWT, and tests.
 Run tests after each change. <promise>AUTH COMPLETE</promise>" --max-iterations 20
 ```
 
-❌ **Bad:** Vague goals with no endpoint
+**Bad:** Vague goals with no endpoint
 
 ```bash
 /autoloop:autoloop "Make the code better" --max-iterations 10
 ```
+
+---
 
 ## Troubleshooting
 
