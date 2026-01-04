@@ -1,8 +1,12 @@
-# Autoloop
+<h1 align="center">Autoloop</h1>
 
-**Let your AI agent work autonomously until the job is done.**
+<p align="center">
+<strong>Let your AI agent work autonomously until the job is done.</strong>
+</p>
 
+<p align="center">
 Walk away from your keyboard. Return to working code.
+</p>
 
 ---
 
@@ -26,14 +30,15 @@ The agent iterates on your task, committing progress along the way. When complet
 
 Traditional AI assistants need constant hand-holding. Prompt, wait, review, prompt again.
 
-Autoloop breaks this cycle:
+**Autoloop breaks this cycle:**
 
-| | |
-|---|---|
-| **Autonomous** | Define your goal and let it work |
-| **Self-correcting** | Each iteration builds on the last |
-| **Safe** | Max iterations prevent runaway loops |
-| **Transparent** | All work preserved in files and git |
+> **Autonomous** — Define your goal and let it work
+>
+> **Self-correcting** — Each iteration builds on the last
+>
+> **Safe** — Max iterations prevent runaway loops
+>
+> **Transparent** — All work preserved in files and git
 
 ---
 
@@ -59,7 +64,7 @@ Run tests after each change.
 | `/autoloop:cancel-autoloop` | Stop the loop |
 | `/autoloop:autoloop-status` | Check progress |
 
-## Options
+### Options
 
 | Option | Description |
 |--------|-------------|
@@ -70,10 +75,12 @@ Run tests after each change.
 
 ## Tips
 
-- **Be specific** — Clear goals prevent endless loops
-- **Set limits** — Always use `--max-iterations`
-- **Verify work** — Include test steps in your prompt
-- **Use commits** — Ask for commits at milestones
+| | |
+|---|---|
+| **Be specific** | Clear goals prevent endless loops |
+| **Set limits** | Always use `--max-iterations` |
+| **Verify work** | Include test steps in your prompt |
+| **Use commits** | Ask for commits at milestones |
 
 ---
 
@@ -81,14 +88,11 @@ Run tests after each change.
 
 ```bash
 claude plugin install autoloop@autoloop --force   # Update
-```
-
-```bash
 claude plugin uninstall autoloop                  # Uninstall
 ```
 
 ---
 
-## License
-
-MIT
+<p align="center">
+<sub>MIT License</sub>
+</p>
