@@ -14,6 +14,11 @@ Start an autonomous iterative loop that continues until completion criteria are 
 - `--max-iterations <n>` - Maximum iterations before stopping (default: unlimited)
 - `-h, --help` - Show help
 
+## Common Prompt File
+
+Create `.claude/autoloop-prompt.md` with common instructions that apply to all loops.
+This content is automatically prepended to every loop prompt.
+
 ## How It Works
 
 1. Execute your task

@@ -6,6 +6,7 @@ set -euo pipefail
 PROMPT_PARTS=()
 MAX_ITERATIONS=0
 COMPLETION_PROMISE="null"
+COMMON_PROMPT_FILE=".claude/autoloop-prompt.md"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -35,6 +36,10 @@ EXAMPLES:
   /autoloop Build a REST API --completion-promise 'DONE' --max-iterations 20
   /autoloop Fix the auth bug --max-iterations 10
   /autoloop --completion-promise 'ALL TESTS PASS' Refactor the cache layer
+
+COMMON PROMPT FILE:
+  Create .claude/autoloop-prompt.md with common instructions that apply to all loops.
+  This content is automatically prepended to every loop prompt.
 
 STOPPING:
   - Reaching --max-iterations limit
@@ -89,6 +94,12 @@ done
 # Join prompt parts
 PROMPT="${PROMPT_PARTS[*]:-}"
 
+# Load common prompt file if exists
+COMMON_PROMPT=""
+if [[ -f "$COMMON_PROMPT_FILE" ]]; then
+  COMMON_PROMPT=$(cat "$COMMON_PROMPT_FILE")
+fi
+
 # Validate prompt
 if [[ -z "$PROMPT" ]]; then
   echo "Error: No prompt provided" >&2
@@ -111,6 +122,18 @@ else
   COMPLETION_PROMISE_YAML="null"
 fi
 
+# Combine common prompt with task prompt
+FULL_PROMPT=""
+if [[ -n "$COMMON_PROMPT" ]]; then
+  FULL_PROMPT="$COMMON_PROMPT
+
+---
+
+$PROMPT"
+else
+  FULL_PROMPT="$PROMPT"
+fi
+
 # Create state file with YAML frontmatter
 cat > .claude/autoloop.local.md <<EOF
 ---
@@ -121,7 +144,7 @@ completion_promise: $COMPLETION_PROMISE_YAML
 started_at: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 ---
 
-$PROMPT
+$FULL_PROMPT
 EOF
 
 # Output setup message
@@ -132,11 +155,12 @@ Autoloop activated!
 Iteration: 1
 Max iterations: $(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo $MAX_ITERATIONS; else echo "unlimited"; fi)
 Completion promise: $(if [[ "$COMPLETION_PROMISE" != "null" ]]; then echo "$COMPLETION_PROMISE"; else echo "none"; fi)
+Common prompt: $(if [[ -n "$COMMON_PROMPT" ]]; then echo "loaded from $COMMON_PROMPT_FILE"; else echo "none"; fi)
 
 The stop hook will feed this prompt back when you try to exit.
 Your previous work persists in files and git history.
 
 EOF
 
-# Output the prompt
-echo "$PROMPT"
+# Output the full prompt
+echo "$FULL_PROMPT"

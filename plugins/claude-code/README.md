@@ -27,6 +27,19 @@ Claude will work autonomously, iterating until it can truthfully output `<promis
 
 **Options:** `--completion-promise <text>` · `--max-iterations <n>` · `--help`
 
+## Common Prompt File
+
+Create `.claude/autoloop-prompt.md` with instructions that apply to all loops:
+
+```markdown
+# Common Instructions
+- Run tests after each change
+- Keep commits small and focused
+- Follow existing code style
+```
+
+This content is automatically prepended to every `/autoloop` prompt.
+
 ## Example Patterns
 
 **TDD Loop:**
