@@ -35,6 +35,46 @@ This content is automatically prepended to every loop prompt.
 ---
 
 ```bash
+# Show help if no arguments provided
+if [ -z "$ARGUMENTS" ] || [ "$ARGUMENTS" = "-h" ] || [ "$ARGUMENTS" = "--help" ]; then
+  cat <<'HELP'
+Autoloop - Autonomous iterative loop for Claude Code
+
+USAGE:
+  /autoloop:autoloop <task> [OPTIONS]
+
+OPTIONS:
+  --max-iterations <n>        Maximum iterations before auto-stop (default: unlimited)
+  --completion-promise <text> Promise phrase that signals completion
+  -h, --help                  Show this help message
+
+DESCRIPTION:
+  Starts an autonomous loop that keeps working until completion. The stop hook
+  prevents exit and feeds the prompt back, allowing iterative improvement.
+
+  To signal completion, output: <promise>YOUR_PHRASE</promise>
+
+EXAMPLES:
+  /autoloop:autoloop Build a REST API --completion-promise 'DONE' --max-iterations 20
+  /autoloop:autoloop Fix the auth bug --max-iterations 10
+  /autoloop:autoloop "Refactor cache layer" --completion-promise 'ALL TESTS PASS'
+
+COMMON PROMPT FILE:
+  Create .claude/autoloop-prompt.md with common instructions that apply to all loops.
+  This content is automatically prepended to every loop prompt.
+
+STOPPING THE LOOP:
+  - Reaching --max-iterations limit
+  - Outputting <promise>COMPLETION_TEXT</promise>
+  - Running /autoloop:cancel-autoloop
+
+OTHER COMMANDS:
+  /autoloop:autoloop-status   Check current loop progress
+  /autoloop:cancel-autoloop   Stop the active loop
+HELP
+  exit 0
+fi
+
 "$PLUGIN_DIR/scripts/setup-loop.sh" $ARGUMENTS
 
 if [ -f .claude/autoloop.local.md ]; then
