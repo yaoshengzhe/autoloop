@@ -2,46 +2,19 @@
 
 Start an autonomous iterative loop that continues until completion criteria are met.
 
-## Usage
-
-```
-/autoloop [PROMPT...] [OPTIONS]
-```
-
-## Options
-
-- `--completion-promise <text>` - Exact text that signals completion
-- `--max-iterations <n>` - Maximum iterations before stopping (default: unlimited)
-- `-h, --help` - Show help
-
-## Common Prompt File
-
-Create `.claude/autoloop-prompt.md` with common instructions that apply to all loops.
-This content is automatically prepended to every loop prompt.
-
-## How It Works
-
-1. Execute your task
-2. When you try to exit, the stop hook intercepts and re-feeds the prompt
-3. Each iteration sees your previous work in files and git history
-4. Loop ends when you output `<promise>TEXT</promise>` or reach max iterations
-
-## Example
-
-```
-/autoloop Build a REST API with tests --completion-promise DONE --max-iterations 10
-```
+**IMPORTANT**: If the script output below shows `[AUTOLOOP_HELP_SHOWN]`, just display the help message to the user without reading any files or taking other actions.
 
 ---
 
 ```bash
 # Show help if no arguments provided
 if [ -z "$ARGUMENTS" ] || [ "$ARGUMENTS" = "-h" ] || [ "$ARGUMENTS" = "--help" ]; then
+  echo "[AUTOLOOP_HELP_SHOWN]"
   cat <<'HELP'
 Autoloop - Autonomous iterative loop for Claude Code
 
 USAGE:
-  /autoloop:autoloop <task> [OPTIONS]
+  /autoloop <task> [OPTIONS]
 
 OPTIONS:
   --max-iterations <n>        Maximum iterations before auto-stop (default: unlimited)
@@ -55,9 +28,9 @@ DESCRIPTION:
   To signal completion, output: <promise>YOUR_PHRASE</promise>
 
 EXAMPLES:
-  /autoloop:autoloop Build a REST API --completion-promise 'DONE' --max-iterations 20
-  /autoloop:autoloop Fix the auth bug --max-iterations 10
-  /autoloop:autoloop "Refactor cache layer" --completion-promise 'ALL TESTS PASS'
+  /autoloop Build a REST API --completion-promise 'DONE' --max-iterations 20
+  /autoloop Fix the auth bug --max-iterations 10
+  /autoloop "Refactor cache layer" --completion-promise 'ALL TESTS PASS'
 
 COMMON PROMPT FILE:
   Create .claude/autoloop-prompt.md with common instructions that apply to all loops.
