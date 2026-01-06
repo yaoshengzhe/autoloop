@@ -13,8 +13,10 @@ Walk away from your keyboard. Return to working code.
 ## Install
 
 ```bash
-claude plugin marketplace add yaoshengzhe/autoloop && claude plugin install autoloop@autoloop
+claude plugin marketplace remove autoloop 2>/dev/null; claude plugin marketplace add yaoshengzhe/autoloop && claude plugin install autoloop@autoloop
 ```
+
+Works for fresh installs and updates alike.
 
 ## Run
 
@@ -87,8 +89,11 @@ Run tests after each change.
 ## Plugin Management
 
 ```bash
-claude plugin install autoloop@autoloop --force   # Update
-claude plugin uninstall autoloop                  # Uninstall
+# Update (same as install command)
+claude plugin marketplace remove autoloop 2>/dev/null; claude plugin marketplace add yaoshengzhe/autoloop && claude plugin install autoloop@autoloop
+
+# Uninstall
+claude plugin uninstall autoloop && claude plugin marketplace remove autoloop
 ```
 
 ---
