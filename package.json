@@ -1,6 +1,6 @@
 {
   "name": "autoloop",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Let your AI agent work autonomously until the job is done",
   "type": "module",
   "main": "src/index.js",

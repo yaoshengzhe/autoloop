@@ -38,6 +38,8 @@ Traditional AI assistants need constant hand-holding. Prompt, wait, review, prom
 >
 > **Self-correcting** — Each iteration builds on the last
 >
+> **Quality-gated** — Completion requires passing tests, build, and lint
+>
 > **Safe** — Max iterations prevent runaway loops
 >
 > **Transparent** — All work preserved in files and git
@@ -75,13 +77,28 @@ Run tests after each change.
 
 ---
 
+## Quality Gates
+
+Autoloop enforces quality before allowing completion:
+
+| Gate | Requirement |
+|------|-------------|
+| **Tests** | All tests must pass (or confirm none exist) |
+| **Build** | Build must succeed (or confirm no build step) |
+| **Lint** | No lint errors (or confirm no linter) |
+| **Task Checklist** | All requirements verified |
+
+The agent must provide a structured completion report with evidence before the loop accepts the promise.
+
+---
+
 ## Tips
 
 | | |
 |---|---|
 | **Be specific** | Clear goals prevent endless loops |
 | **Set limits** | Always use `--max-iterations` |
-| **Verify work** | Include test steps in your prompt |
+| **Include tests** | Agent must verify tests pass before completing |
 | **Use commits** | Ask for commits at milestones |
 
 ---
