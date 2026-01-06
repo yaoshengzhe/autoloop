@@ -121,6 +121,10 @@ fi
 # Create state directory
 mkdir -p .claude
 
+# Create unique log file for this execution
+LOG_TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+LOG_FILE=".claude/autoloop-${LOG_TIMESTAMP}.log"
+
 # Quote completion promise for YAML
 if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
   COMPLETION_PROMISE_YAML="\"$COMPLETION_PROMISE\""
@@ -140,6 +144,9 @@ else
   FULL_PROMPT="$PROMPT"
 fi
 
+# Get start time
+START_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
 # Create state file with YAML frontmatter
 cat > .claude/autoloop.local.md <<EOF
 ---
@@ -147,10 +154,33 @@ active: true
 iteration: 1
 max_iterations: $MAX_ITERATIONS
 completion_promise: $COMPLETION_PROMISE_YAML
-started_at: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+started_at: "$START_TIME"
+log_file: "$LOG_FILE"
 ---
 
 $FULL_PROMPT
+EOF
+
+# Initialize log file
+cat > "$LOG_FILE" <<EOF
+# Autoloop Execution Log
+Started: $START_TIME
+
+## Configuration
+- Max iterations: $(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo $MAX_ITERATIONS; else echo "unlimited"; fi)
+- Completion promise: $(if [[ "$COMPLETION_PROMISE" != "null" ]]; then echo "$COMPLETION_PROMISE"; else echo "none"; fi)
+- Common prompt: $(if [[ -n "$COMMON_PROMPT" ]]; then echo "loaded from $COMMON_PROMPT_SOURCE"; else echo "not found"; fi)
+
+## Prompt
+\`\`\`
+$FULL_PROMPT
+\`\`\`
+
+---
+
+## Iteration 1
+Started: $START_TIME
+
 EOF
 
 # Output setup message with working log
@@ -164,6 +194,7 @@ echo "  • Iteration:     1$(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo " of $MA
 echo "  • Max iterations: $(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo $MAX_ITERATIONS; else echo "unlimited"; fi)"
 echo "  • Promise:       $(if [[ "$COMPLETION_PROMISE" != "null" ]]; then echo "$COMPLETION_PROMISE"; else echo "none"; fi)"
 echo "  • Common prompt: $(if [[ -n "$COMMON_PROMPT" ]]; then echo "loaded from $COMMON_PROMPT_SOURCE"; else echo "not found (create .claude/autoloop-prompt.md)"; fi)"
+echo "  • Log file:      $LOG_FILE"
 echo ""
 echo "The stop hook will feed this prompt back when you try to exit."
 echo "Your previous work persists in files and git history."

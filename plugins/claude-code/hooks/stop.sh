@@ -20,6 +20,14 @@ ACTIVE=$(parse_yaml_value "active")
 ITERATION=$(parse_yaml_value "iteration")
 MAX_ITERATIONS=$(parse_yaml_value "max_iterations")
 COMPLETION_PROMISE=$(parse_yaml_value "completion_promise")
+LOG_FILE=$(parse_yaml_value "log_file")
+
+# Helper function to append to log file
+log_append() {
+  if [[ -n "$LOG_FILE" ]] && [[ -f "$LOG_FILE" ]]; then
+    echo "$1" >> "$LOG_FILE"
+  fi
+}
 
 # Extract prompt (content after frontmatter)
 # Find the line number of the closing --- of YAML frontmatter (second occurrence)
@@ -31,6 +39,16 @@ PROMPT=$(tail -n +$((FRONTMATTER_END + 1)) "$STATE_FILE" | sed '/./,$!d')
 # Exit if not active
 if [[ "$ACTIVE" != "true" ]]; then
   exit 0
+fi
+
+# Log transcript for this iteration
+if [[ -n "${CLAUDE_TRANSCRIPT:-}" ]]; then
+  log_append "### Transcript"
+  log_append ""
+  log_append "\`\`\`"
+  log_append "$CLAUDE_TRANSCRIPT"
+  log_append "\`\`\`"
+  log_append ""
 fi
 
 # Check for completion promise in transcript with quality gate validation
@@ -76,6 +94,14 @@ if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
          [[ "$HAS_BUILD" == "true" ]] && [[ "$HAS_LINT" == "true" ]] && \
          [[ "$HAS_CHECKLIST" == "true" ]] && [[ "$HAS_SUMMARY" == "true" ]] && \
          [[ "$HAS_FAILURE" == "false" ]]; then
+        # Log completion
+        log_append "---"
+        log_append ""
+        log_append "## Completion"
+        log_append "Ended: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        log_append "Status: SUCCESS - Quality gates passed"
+        log_append "Total iterations: $ITERATION"
+        log_append ""
         rm -f "$STATE_FILE"
         echo ""
         echo "═══════════════════════════════════════════════════════════"
@@ -90,6 +116,31 @@ if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
         exit 0
       else
         # Promise found but quality gates not met
+        # Log the rejection
+        log_append "### Completion Rejected"
+        log_append "Quality gates not satisfied:"
+        if [[ "$HAS_REPORT" != "true" ]]; then
+          log_append "- Missing <completion-report> wrapper"
+        fi
+        if [[ "$HAS_TESTS" != "true" ]]; then
+          log_append "- Missing or failed <tests> verification"
+        fi
+        if [[ "$HAS_BUILD" != "true" ]]; then
+          log_append "- Missing or failed <build> verification"
+        fi
+        if [[ "$HAS_LINT" != "true" ]]; then
+          log_append "- Missing or failed <lint> verification"
+        fi
+        if [[ "$HAS_CHECKLIST" != "true" ]]; then
+          log_append "- Missing <task-checklist>"
+        fi
+        if [[ "$HAS_SUMMARY" != "true" ]]; then
+          log_append "- Missing <summary>"
+        fi
+        if [[ "$HAS_FAILURE" == "true" ]]; then
+          log_append "- One or more checks reported FAIL"
+        fi
+        log_append ""
         echo ""
         echo "═══════════════════════════════════════════════════════════"
         echo "AUTOLOOP - Completion REJECTED"
@@ -130,6 +181,14 @@ fi
 # Check iteration limit
 NEXT_ITERATION=$((ITERATION + 1))
 if [[ "$MAX_ITERATIONS" -gt 0 ]] && [[ "$NEXT_ITERATION" -gt "$MAX_ITERATIONS" ]]; then
+  # Log max iterations reached
+  log_append "---"
+  log_append ""
+  log_append "## Completion"
+  log_append "Ended: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  log_append "Status: STOPPED - Max iterations ($MAX_ITERATIONS) reached"
+  log_append "Total iterations: $ITERATION"
+  log_append ""
   rm -f "$STATE_FILE"
   echo ""
   echo "AUTOLOOP STOPPED - Max iterations ($MAX_ITERATIONS) reached"
@@ -152,6 +211,7 @@ iteration: $NEXT_ITERATION
 max_iterations: $MAX_ITERATIONS
 completion_promise: $COMPLETION_PROMISE_YAML
 started_at: "$STARTED_AT"
+log_file: "$LOG_FILE"
 ---
 
 $PROMPT
@@ -170,6 +230,14 @@ if [[ -n "$STARTED_AT" ]]; then
     ELAPSED_STR="${ELAPSED_MIN}m ${ELAPSED_SEC}s"
   fi
 fi
+
+# Log next iteration header
+log_append "---"
+log_append ""
+log_append "## Iteration $NEXT_ITERATION"
+log_append "Started: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+log_append "Elapsed: $ELAPSED_STR"
+log_append ""
 
 # Output continuation message with progress log
 echo ""

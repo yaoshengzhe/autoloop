@@ -3,6 +3,7 @@ node_modules/
 
 # Autoloop state files (should not be committed)
 .claude/autoloop.local.md
+.claude/autoloop-*.log
 
 # OS files
 .DS_Store
