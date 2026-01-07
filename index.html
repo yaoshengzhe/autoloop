@@ -537,7 +537,7 @@
       </div>
       <h1>Autoloop</h1>
       <p class="tagline">Autonomous AI coding that doesn't stop until it's done.</p>
-      <p class="subtitle">Give Claude Code a task with a completion promise. Walk away. Return to working code.</p>
+      <p class="subtitle">Give Claude Code a task. An independent agent verifies completion. Walk away. Return to working code.</p>
       <div class="hero-cta">
         <a href="#install" class="btn btn-primary">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -559,7 +559,7 @@
 <span class="code-command">claude plugin marketplace add</span> yaoshengzhe/autoloop && <span class="code-command">claude plugin install</span> autoloop@autoloop
 
 <span class="code-comment"># Start an autonomous loop</span>
-<span class="code-command">/autoloop:autoloop</span> Build a REST API with tests <span class="code-flag">--completion-promise</span> <span class="code-string">'DONE'</span> <span class="code-flag">--max-iterations</span> 15</code></pre>
+<span class="code-command">/autoloop:autoloop</span> Build a REST API with tests <span class="code-flag">--max-iterations</span> 15</code></pre>
     </section>
 
     <section class="how-it-works fade-in">
@@ -571,7 +571,7 @@
           <div class="step-number">1</div>
           <div class="step-content">
             <h3>Define Your Task</h3>
-            <p>Give Claude Code a detailed prompt with clear deliverables and a completion promise that signals when the work is done.</p>
+            <p>Give Claude Code a detailed prompt with clear deliverables. Specific requirements help the verifier check completion.</p>
           </div>
         </div>
         <div class="step">
@@ -584,15 +584,15 @@
         <div class="step">
           <div class="step-number">3</div>
           <div class="step-content">
-            <h3>Loop Continues Until Done</h3>
-            <p>A stop hook intercepts exit attempts. If the promise isn't fulfilled, the agent continues with fresh context from files and git history.</p>
+            <h3>Independent Verification</h3>
+            <p>When completion is claimed, a separate agent verifies the work. It runs actual tests, checks the build, and validates all requirements.</p>
           </div>
         </div>
         <div class="step">
           <div class="step-number">4</div>
           <div class="step-content">
-            <h3>Review the Results</h3>
-            <p>When the promise is fulfilled (or max iterations reached), you get working code with a full git history of every decision.</p>
+            <h3>Loop Until Verified</h3>
+            <p>If verification fails, the agent sees the feedback and continues working. Only verified completions end the loop.</p>
           </div>
         </div>
       </div>
@@ -624,8 +624,8 @@
           <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
-          <h3>Safe</h3>
-          <p>Set max iterations to prevent runaway loops. The agent can only claim completion when the promise is genuinely fulfilled.</p>
+          <h3>Independently Verified</h3>
+          <p>A separate agent (with no conversation access) verifies completion by running actual tests, build, and lint. No self-reporting bias.</p>
         </div>
         <div class="feature">
           <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -650,7 +650,7 @@
           </div>
           <pre><code><span class="code-command">/autoloop:autoloop</span> <span class="code-string">"Write tests first, then implement
 until all tests pass. Coverage > 80%"</span>
-<span class="code-flag">--completion-promise</span> <span class="code-string">'ALL TESTS PASS'</span></code></pre>
+<span class="code-flag">--max-iterations</span> 15</code></pre>
         </div>
         <div class="use-case">
           <div class="use-case-header">
@@ -659,7 +659,7 @@ until all tests pass. Coverage > 80%"</span>
           </div>
           <pre><code><span class="code-command">/autoloop:autoloop</span> <span class="code-string">"Build user auth with JWT,
 login/logout, and password reset"</span>
-<span class="code-flag">--completion-promise</span> <span class="code-string">'AUTH COMPLETE'</span></code></pre>
+<span class="code-flag">--max-iterations</span> 20</code></pre>
         </div>
         <div class="use-case">
           <div class="use-case-header">
@@ -668,7 +668,7 @@ login/logout, and password reset"</span>
           </div>
           <pre><code><span class="code-command">/autoloop:autoloop</span> <span class="code-string">"Debug the payment flow.
 Find root cause, fix it, add tests"</span>
-<span class="code-flag">--completion-promise</span> <span class="code-string">'BUG FIXED'</span></code></pre>
+<span class="code-flag">--max-iterations</span> 10</code></pre>
         </div>
         <div class="use-case">
           <div class="use-case-header">
@@ -677,7 +677,7 @@ Find root cause, fix it, add tests"</span>
           </div>
           <pre><code><span class="code-command">/autoloop:autoloop</span> <span class="code-string">"Refactor to clean architecture.
 Keep all tests passing throughout"</span>
-<span class="code-flag">--completion-promise</span> <span class="code-string">'REFACTOR DONE'</span></code></pre>
+<span class="code-flag">--max-iterations</span> 25</code></pre>
         </div>
       </div>
     </section>
@@ -701,13 +701,11 @@ Keep all tests passing throughout"</span>
 - Password hashing with bcrypt
 - Rate limiting on auth endpoints
 
-<span class="code-comment"># Verification</span>
+<span class="code-comment"># Verification (checked by independent agent)</span>
 - Unit tests with 80%+ coverage
 - Integration tests for all endpoints
-- Run tests after each change
-
-<span class="code-comment"># Completion Signal</span>
-&lt;promise&gt;AUTH SYSTEM COMPLETE&lt;/promise&gt;"</span>
+- All tests passing
+- Build succeeds"</span>
 
 <span class="code-flag">--max-iterations</span> 25</code></pre>
         </div>
