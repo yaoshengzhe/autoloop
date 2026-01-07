@@ -1,9 +1,12 @@
 #!/bin/bash
 # Stop hook - intercepts exit and continues loop if active
+# Uses independent subagent verification for quality control
 
 set -uo pipefail
 
 STATE_FILE=".claude/autoloop.local.md"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VERIFY_SCRIPT="$SCRIPT_DIR/../scripts/verify-completion.sh"
 
 # Exit early if no state file
 if [[ ! -f "$STATE_FILE" ]]; then
@@ -19,7 +22,6 @@ parse_yaml_value() {
 ACTIVE=$(parse_yaml_value "active")
 ITERATION=$(parse_yaml_value "iteration")
 MAX_ITERATIONS=$(parse_yaml_value "max_iterations")
-COMPLETION_PROMISE=$(parse_yaml_value "completion_promise")
 LOG_FILE=$(parse_yaml_value "log_file")
 
 # Helper function to append to log file
@@ -51,130 +53,85 @@ if [[ -n "${CLAUDE_TRANSCRIPT:-}" ]]; then
   log_append ""
 fi
 
-# Check for completion promise in transcript with quality gate validation
-# Use grep -F for fixed string matching to prevent regex injection
-if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
-  if [[ -n "${CLAUDE_TRANSCRIPT:-}" ]]; then
-    if echo "$CLAUDE_TRANSCRIPT" | grep -qF "<promise>${COMPLETION_PROMISE}</promise>"; then
-      # Quality gate: Check for completion report
-      HAS_REPORT=false
-      HAS_TESTS=false
-      HAS_BUILD=false
-      HAS_LINT=false
-      HAS_CHECKLIST=false
-      HAS_SUMMARY=false
+# Check if Claude claimed completion with <complete/> tag
+# This is a simple signal - actual verification is done by subagent
+CLAIMED_COMPLETE=false
+if [[ -n "${CLAUDE_TRANSCRIPT:-}" ]]; then
+  if echo "$CLAUDE_TRANSCRIPT" | grep -qF "<complete/>"; then
+    CLAIMED_COMPLETE=true
+  fi
+fi
 
-      if echo "$CLAUDE_TRANSCRIPT" | grep -q "<completion-report>"; then
-        HAS_REPORT=true
-      fi
-      if echo "$CLAUDE_TRANSCRIPT" | grep -qE "<tests>(PASS|SKIP)"; then
-        HAS_TESTS=true
-      fi
-      if echo "$CLAUDE_TRANSCRIPT" | grep -qE "<build>(PASS|SKIP)"; then
-        HAS_BUILD=true
-      fi
-      if echo "$CLAUDE_TRANSCRIPT" | grep -qE "<lint>(PASS|SKIP)"; then
-        HAS_LINT=true
-      fi
-      if echo "$CLAUDE_TRANSCRIPT" | grep -q "<task-checklist>"; then
-        HAS_CHECKLIST=true
-      fi
-      if echo "$CLAUDE_TRANSCRIPT" | grep -q "<summary>"; then
-        HAS_SUMMARY=true
-      fi
+# If completion claimed, run independent subagent verification
+if [[ "$CLAIMED_COMPLETE" == "true" ]]; then
+  echo ""
+  echo "═══════════════════════════════════════════════════════════"
+  echo "AUTOLOOP - Completion Claimed"
+  echo "═══════════════════════════════════════════════════════════"
+  echo ""
+  echo "Running independent verification agent..."
+  echo "(This agent has no context of our conversation)"
+  echo ""
 
-      # Check if any verification reported FAIL
-      HAS_FAILURE=false
-      if echo "$CLAUDE_TRANSCRIPT" | grep -qE "<tests>FAIL|<build>FAIL|<lint>FAIL"; then
-        HAS_FAILURE=true
-      fi
+  log_append "### Independent Verification"
+  log_append "Started: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  log_append ""
 
-      # Validate completion report
-      if [[ "$HAS_REPORT" == "true" ]] && [[ "$HAS_TESTS" == "true" ]] && \
-         [[ "$HAS_BUILD" == "true" ]] && [[ "$HAS_LINT" == "true" ]] && \
-         [[ "$HAS_CHECKLIST" == "true" ]] && [[ "$HAS_SUMMARY" == "true" ]] && \
-         [[ "$HAS_FAILURE" == "false" ]]; then
-        # Log completion
-        log_append "---"
-        log_append ""
-        log_append "## Completion"
-        log_append "Ended: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-        log_append "Status: SUCCESS - Quality gates passed"
-        log_append "Total iterations: $ITERATION"
-        log_append ""
-        rm -f "$STATE_FILE"
-        echo ""
-        echo "═══════════════════════════════════════════════════════════"
-        echo "AUTOLOOP COMPLETE - Quality gates passed"
-        echo "═══════════════════════════════════════════════════════════"
-        echo ""
-        echo "  ✓ Completion report validated"
-        echo "  ✓ All verification checks passed"
-        echo "  ✓ Promise fulfilled after $ITERATION iteration(s)"
-        echo ""
-        echo "═══════════════════════════════════════════════════════════"
-        exit 0
-      else
-        # Promise found but quality gates not met
-        # Log the rejection
-        log_append "### Completion Rejected"
-        log_append "Quality gates not satisfied:"
-        if [[ "$HAS_REPORT" != "true" ]]; then
-          log_append "- Missing <completion-report> wrapper"
-        fi
-        if [[ "$HAS_TESTS" != "true" ]]; then
-          log_append "- Missing or failed <tests> verification"
-        fi
-        if [[ "$HAS_BUILD" != "true" ]]; then
-          log_append "- Missing or failed <build> verification"
-        fi
-        if [[ "$HAS_LINT" != "true" ]]; then
-          log_append "- Missing or failed <lint> verification"
-        fi
-        if [[ "$HAS_CHECKLIST" != "true" ]]; then
-          log_append "- Missing <task-checklist>"
-        fi
-        if [[ "$HAS_SUMMARY" != "true" ]]; then
-          log_append "- Missing <summary>"
-        fi
-        if [[ "$HAS_FAILURE" == "true" ]]; then
-          log_append "- One or more checks reported FAIL"
-        fi
-        log_append ""
-        echo ""
-        echo "═══════════════════════════════════════════════════════════"
-        echo "AUTOLOOP - Completion REJECTED"
-        echo "═══════════════════════════════════════════════════════════"
-        echo ""
-        echo "Promise was output but quality gates not satisfied:"
-        echo ""
-        if [[ "$HAS_REPORT" != "true" ]]; then
-          echo "  ✗ Missing <completion-report> wrapper"
-        fi
-        if [[ "$HAS_TESTS" != "true" ]]; then
-          echo "  ✗ Missing or failed <tests> verification"
-        fi
-        if [[ "$HAS_BUILD" != "true" ]]; then
-          echo "  ✗ Missing or failed <build> verification"
-        fi
-        if [[ "$HAS_LINT" != "true" ]]; then
-          echo "  ✗ Missing or failed <lint> verification"
-        fi
-        if [[ "$HAS_CHECKLIST" != "true" ]]; then
-          echo "  ✗ Missing <task-checklist>"
-        fi
-        if [[ "$HAS_SUMMARY" != "true" ]]; then
-          echo "  ✗ Missing <summary>"
-        fi
-        if [[ "$HAS_FAILURE" == "true" ]]; then
-          echo "  ✗ One or more checks reported FAIL"
-        fi
-        echo ""
-        echo "Continue working until ALL quality gates pass."
-        echo "═══════════════════════════════════════════════════════════"
-        # Continue the loop - don't exit 0
-      fi
+  # Run verification script
+  if [[ -x "$VERIFY_SCRIPT" ]]; then
+    VERIFY_OUTPUT=$("$VERIFY_SCRIPT" 2>&1)
+    VERIFY_EXIT=$?
+
+    log_append "\`\`\`"
+    log_append "$VERIFY_OUTPUT"
+    log_append "\`\`\`"
+    log_append ""
+
+    echo "$VERIFY_OUTPUT"
+
+    if [[ $VERIFY_EXIT -eq 0 ]]; then
+      # Verification passed
+      log_append "---"
+      log_append ""
+      log_append "## Completion"
+      log_append "Ended: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      log_append "Status: SUCCESS - Independent verification passed"
+      log_append "Total iterations: $ITERATION"
+      log_append ""
+
+      rm -f "$STATE_FILE"
+      echo ""
+      echo "═══════════════════════════════════════════════════════════"
+      echo "AUTOLOOP COMPLETE - Verified by independent agent"
+      echo "═══════════════════════════════════════════════════════════"
+      echo ""
+      echo "  ✓ Independent verification PASSED"
+      echo "  ✓ Completed after $ITERATION iteration(s)"
+      echo ""
+      echo "═══════════════════════════════════════════════════════════"
+      exit 0
+    else
+      # Verification failed
+      log_append "### Verification Failed"
+      log_append "Continue working to address issues."
+      log_append ""
+
+      echo ""
+      echo "═══════════════════════════════════════════════════════════"
+      echo "AUTOLOOP - Verification FAILED"
+      echo "═══════════════════════════════════════════════════════════"
+      echo ""
+      echo "The independent verifier found issues."
+      echo "Review the verification output above and continue working."
+      echo ""
+      echo "═══════════════════════════════════════════════════════════"
+      # Continue loop - don't exit 0
     fi
+  else
+    echo "ERROR: Verification script not found or not executable"
+    echo "Path: $VERIFY_SCRIPT"
+    log_append "ERROR: Verification script not found"
+    # Continue loop on error
   fi
 fi
 
@@ -196,12 +153,6 @@ if [[ "$MAX_ITERATIONS" -gt 0 ]] && [[ "$NEXT_ITERATION" -gt "$MAX_ITERATIONS" ]
 fi
 
 # Update state file with new iteration
-if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
-  COMPLETION_PROMISE_YAML="\"$COMPLETION_PROMISE\""
-else
-  COMPLETION_PROMISE_YAML="null"
-fi
-
 STARTED_AT=$(parse_yaml_value "started_at")
 
 cat > "$STATE_FILE" <<EOF
@@ -209,7 +160,6 @@ cat > "$STATE_FILE" <<EOF
 active: true
 iteration: $NEXT_ITERATION
 max_iterations: $MAX_ITERATIONS
-completion_promise: $COMPLETION_PROMISE_YAML
 started_at: "$STARTED_AT"
 log_file: "$LOG_FILE"
 ---
@@ -252,29 +202,20 @@ echo "  • Status:        Active - continuing work"
 echo ""
 echo "Continue working on the task. Previous work is preserved."
 echo ""
-if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
-  echo "───────────────────────────────────────────────────────────"
-  echo "COMPLETION REQUIREMENTS:"
-  echo ""
-  echo "Before claiming completion, you MUST:"
-  echo "  1. Run tests (or confirm no tests exist)"
-  echo "  2. Run build (or confirm no build step)"
-  echo "  3. Run lint (or confirm no linter)"
-  echo "  4. Verify ALL task requirements are met"
-  echo "  5. Provide completion report with evidence"
-  echo ""
-  echo "Format:"
-  echo "  <completion-report>"
-  echo "    <tests>PASS/SKIP - [output]</tests>"
-  echo "    <build>PASS/SKIP - [output]</build>"
-  echo "    <lint>PASS/SKIP - [output]</lint>"
-  echo "    <task-checklist>- [x] each requirement</task-checklist>"
-  echo "    <summary>Work done</summary>"
-  echo "  </completion-report>"
-  echo "  <promise>$COMPLETION_PROMISE</promise>"
-  echo "───────────────────────────────────────────────────────────"
-  echo ""
-fi
+echo "───────────────────────────────────────────────────────────"
+echo "TO SIGNAL COMPLETION:"
+echo ""
+echo "When you believe the task is complete, output: <complete/>"
+echo ""
+echo "An independent verification agent will then:"
+echo "  • Run tests, build, and lint"
+echo "  • Check all task requirements are met"
+echo "  • Approve or reject with specific feedback"
+echo ""
+echo "Note: The verifier has NO access to our conversation."
+echo "It only sees the task description and actual code/files."
+echo "───────────────────────────────────────────────────────────"
+echo ""
 echo "═══════════════════════════════════════════════════════════"
 echo ""
 echo "$PROMPT"

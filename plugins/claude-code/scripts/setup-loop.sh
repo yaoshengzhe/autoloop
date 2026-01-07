@@ -5,7 +5,6 @@ set -euo pipefail
 
 PROMPT_PARTS=()
 MAX_ITERATIONS=0
-COMPLETION_PROMISE="null"
 COMMON_PROMPT_FILE=".claude/autoloop-prompt.md"
 
 # Parse arguments
@@ -22,20 +21,22 @@ ARGUMENTS:
   PROMPT...    Task description (can be multiple words without quotes)
 
 OPTIONS:
-  --max-iterations <n>        Maximum iterations before auto-stop (default: unlimited)
-  --completion-promise <text> Promise phrase that signals completion
-  -h, --help                  Show this help message
+  --max-iterations <n>  Maximum iterations before auto-stop (default: unlimited)
+  -h, --help            Show this help message
 
 DESCRIPTION:
-  Starts an autonomous loop that keeps working until completion. The stop hook
-  prevents exit and feeds the prompt back, allowing iterative improvement.
+  Starts an autonomous loop that keeps working until completion. Uses
+  independent subagent verification for rigorous quality control.
 
-  To signal completion, output: <promise>YOUR_PHRASE</promise>
+  To signal completion, output: <complete/>
+
+  An independent verification agent (with NO access to the conversation)
+  will then check tests, build, lint, and task requirements.
 
 EXAMPLES:
-  /autoloop:autoloop Build a REST API --completion-promise 'DONE' --max-iterations 20
+  /autoloop:autoloop Build a REST API --max-iterations 20
   /autoloop:autoloop Fix the auth bug --max-iterations 10
-  /autoloop:autoloop --completion-promise 'ALL TESTS PASS' Refactor the cache layer
+  /autoloop:autoloop Refactor the cache layer
 
 COMMON PROMPT FILE:
   Create .claude/autoloop-prompt.md with common instructions that apply to all loops.
@@ -43,7 +44,7 @@ COMMON PROMPT FILE:
 
 STOPPING:
   - Reaching --max-iterations limit
-  - Outputting <promise>COMPLETION_TEXT</promise>
+  - Outputting <complete/> and passing verification
   - Running /autoloop:cancel-autoloop
 
 MONITORING:
@@ -73,15 +74,8 @@ HELP_EOF
       shift 2
       ;;
     --completion-promise)
-      if [[ -z "${2:-}" ]]; then
-        echo "Error: --completion-promise requires text" >&2
-        echo "" >&2
-        echo "Examples:" >&2
-        echo "  --completion-promise 'DONE'" >&2
-        echo "  --completion-promise 'ALL TESTS PASS'" >&2
-        exit 1
-      fi
-      COMPLETION_PROMISE="$2"
+      # Deprecated - kept for backwards compatibility but ignored
+      echo "Note: --completion-promise is deprecated. Using subagent verification instead." >&2
       shift 2
       ;;
     *)
@@ -125,13 +119,6 @@ mkdir -p .claude
 LOG_TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
 LOG_FILE=".claude/autoloop-${LOG_TIMESTAMP}.log"
 
-# Quote completion promise for YAML
-if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
-  COMPLETION_PROMISE_YAML="\"$COMPLETION_PROMISE\""
-else
-  COMPLETION_PROMISE_YAML="null"
-fi
-
 # Combine common prompt with task prompt
 FULL_PROMPT=""
 if [[ -n "$COMMON_PROMPT" ]]; then
@@ -153,7 +140,6 @@ cat > .claude/autoloop.local.md <<EOF
 active: true
 iteration: 1
 max_iterations: $MAX_ITERATIONS
-completion_promise: $COMPLETION_PROMISE_YAML
 started_at: "$START_TIME"
 log_file: "$LOG_FILE"
 ---
@@ -168,7 +154,7 @@ Started: $START_TIME
 
 ## Configuration
 - Max iterations: $(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo $MAX_ITERATIONS; else echo "unlimited"; fi)
-- Completion promise: $(if [[ "$COMPLETION_PROMISE" != "null" ]]; then echo "$COMPLETION_PROMISE"; else echo "none"; fi)
+- Verification: Independent subagent
 - Common prompt: $(if [[ -n "$COMMON_PROMPT" ]]; then echo "loaded from $COMMON_PROMPT_SOURCE"; else echo "not found"; fi)
 
 ## Prompt
@@ -192,12 +178,16 @@ echo ""
 echo "Configuration:"
 echo "  • Iteration:     1$(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo " of $MAX_ITERATIONS"; fi)"
 echo "  • Max iterations: $(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo $MAX_ITERATIONS; else echo "unlimited"; fi)"
-echo "  • Promise:       $(if [[ "$COMPLETION_PROMISE" != "null" ]]; then echo "$COMPLETION_PROMISE"; else echo "none"; fi)"
+echo "  • Verification:  Independent subagent (no conversation context)"
 echo "  • Common prompt: $(if [[ -n "$COMMON_PROMPT" ]]; then echo "loaded from $COMMON_PROMPT_SOURCE"; else echo "not found (create .claude/autoloop-prompt.md)"; fi)"
 echo "  • Log file:      $LOG_FILE"
 echo ""
-echo "The stop hook will feed this prompt back when you try to exit."
-echo "Your previous work persists in files and git history."
+echo "To signal completion: output <complete/>"
+echo ""
+echo "An independent verification agent will check your work."
+echo "The verifier has NO access to this conversation - only the task"
+echo "description and actual code/files. It will run tests, build, lint"
+echo "and verify all requirements are met."
 echo ""
 echo "═══════════════════════════════════════════════════════════"
 echo ""
