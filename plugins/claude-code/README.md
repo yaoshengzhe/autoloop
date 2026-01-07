@@ -13,10 +13,10 @@ claude plugin marketplace add yaoshengzhe/autoloop && claude plugin install auto
 ## Quick Start
 
 ```bash
-/autoloop:autoloop Create a Python CLI with tests --completion-promise 'DONE' --max-iterations 5
+/autoloop:autoloop Create a Python CLI with tests --max-iterations 5
 ```
 
-Claude will work autonomously, iterating until it can truthfully output `<promise>DONE</promise>`.
+Claude works autonomously. When it outputs `<complete/>`, an independent verification agent confirms the work is actually done.
 
 ---
 
@@ -28,7 +28,20 @@ Claude will work autonomously, iterating until it can truthfully output `<promis
 | `/autoloop:cancel-autoloop` | Stop immediately |
 | `/autoloop:autoloop-status` | Check progress |
 
-**Options:** `--completion-promise <text>` | `--max-iterations <n>` | `--help`
+**Options:** `--max-iterations <n>` | `--help`
+
+---
+
+## How Verification Works
+
+When Claude outputs `<complete/>`, a separate verification agent spawns:
+
+1. **No conversation access** — Only sees task description and actual files
+2. **Runs real commands** — Executes tests, build, lint (not self-reported)
+3. **Checks requirements** — Validates each task requirement against code
+4. **Returns verdict** — APPROVED (loop ends) or REJECTED (loop continues with feedback)
+
+This eliminates self-reporting bias — the verifier has no knowledge of what Claude *said* it did, only what actually exists.
 
 ---
 
@@ -51,38 +64,36 @@ This content is automatically prepended to every `/autoloop:autoloop` prompt.
 
 **TDD Loop:**
 ```bash
-/autoloop:autoloop "Implement ShoppingCart with TDD. Run pytest after each change.
-<promise>ALL TESTS GREEN</promise>" --max-iterations 15
+/autoloop:autoloop "Implement ShoppingCart with TDD. Run pytest after each change." --max-iterations 15
 ```
 
 **Feature Build:**
 ```bash
-/autoloop:autoloop "Build a markdown blog engine with index page.
-Commit after each milestone. <promise>COMPLETE</promise>" --max-iterations 20
+/autoloop:autoloop "Build a markdown blog engine with index page. Commit after each milestone." --max-iterations 20
 ```
 
 **Bug Fix:**
 ```bash
-/autoloop:autoloop "Fix the memory leak in WebSocket handler.
-Verify with load test. <promise>FIXED</promise>" --max-iterations 10
+/autoloop:autoloop "Fix the memory leak in WebSocket handler. Verify with load test." --max-iterations 10
 ```
 
 ---
 
 ## Writing Good Prompts
 
-**Good:** Specific deliverables + verification steps + clear completion signal
+**Good:** Specific deliverables + verification steps
 
 ```bash
-/autoloop:autoloop "Build auth module with login/logout, JWT, and tests.
-Run tests after each change. <promise>AUTH COMPLETE</promise>" --max-iterations 20
+/autoloop:autoloop "Build auth module with login/logout, JWT, and tests. Run tests after each change." --max-iterations 20
 ```
 
-**Bad:** Vague goals with no endpoint
+**Bad:** Vague goals with no clear requirements
 
 ```bash
 /autoloop:autoloop "Make the code better" --max-iterations 10
 ```
+
+The verifier needs concrete requirements to check against.
 
 ---
 
@@ -90,6 +101,6 @@ Run tests after each change. <promise>AUTH COMPLETE</promise>" --max-iterations 
 
 | Issue | Solution |
 |-------|----------|
-| Loop exits immediately | Completion promise in your prompt; rephrase it |
-| Loop runs forever | Add `--max-iterations`; clarify completion criteria |
+| Verification keeps failing | Check verifier output for specific issues |
+| Loop runs forever | Add `--max-iterations`; make requirements clearer |
 | Agent stuck | Run `/autoloop:autoloop-status`, then `/autoloop:cancel-autoloop` if needed |

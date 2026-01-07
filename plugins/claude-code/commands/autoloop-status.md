@@ -11,9 +11,9 @@ Check the status of the current autoloop.
 Displays:
 - Current iteration number
 - Max iterations (if set)
-- Completion promise (if set)
 - Elapsed time
 - Active status
+- Verification method
 
 ---
 
@@ -34,7 +34,6 @@ parse_yaml_value() {
 ACTIVE=$(parse_yaml_value "active")
 ITERATION=$(parse_yaml_value "iteration")
 MAX_ITERATIONS=$(parse_yaml_value "max_iterations")
-COMPLETION_PROMISE=$(parse_yaml_value "completion_promise")
 STARTED_AT=$(parse_yaml_value "started_at")
 
 # Calculate elapsed time
@@ -54,12 +53,12 @@ echo "════════════════════════�
 echo "AUTOLOOP STATUS"
 echo "═══════════════════════════════════════════════════════════"
 echo ""
-echo "Active:      $ACTIVE"
-echo "Iteration:   $ITERATION$(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo "/$MAX_ITERATIONS"; fi)"
-echo "Elapsed:     $ELAPSED_STR"
-if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
-  echo "Promise:     $COMPLETION_PROMISE"
-fi
+echo "Active:       $ACTIVE"
+echo "Iteration:    $ITERATION$(if [[ $MAX_ITERATIONS -gt 0 ]]; then echo "/$MAX_ITERATIONS"; fi)"
+echo "Elapsed:      $ELAPSED_STR"
+echo "Verification: Independent subagent"
+echo ""
+echo "To complete: output <complete/>"
 echo ""
 echo "═══════════════════════════════════════════════════════════"
 ```

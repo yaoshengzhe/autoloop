@@ -21,10 +21,10 @@ Works for fresh installs and updates alike.
 ## Run
 
 ```bash
-/autoloop:autoloop Build a REST API with tests --completion-promise 'DONE' --max-iterations 15
+/autoloop:autoloop Build a REST API with tests --max-iterations 15
 ```
 
-The agent iterates on your task, committing progress along the way. When complete, it outputs `<promise>DONE</promise>` and exits.
+The agent iterates on your task, committing progress along the way. When complete, an **independent verification agent** confirms all tests pass before exiting.
 
 ---
 
@@ -38,11 +38,26 @@ Traditional AI assistants need constant hand-holding. Prompt, wait, review, prom
 >
 > **Self-correcting** — Each iteration builds on the last
 >
-> **Quality-gated** — Completion requires passing tests, build, and lint
+> **Independently verified** — A separate agent verifies completion (no self-reporting)
 >
 > **Safe** — Max iterations prevent runaway loops
 >
 > **Transparent** — All work preserved in files and git
+
+---
+
+## Independent Verification
+
+When Claude claims completion with `<complete/>`, an independent verification agent takes over:
+
+| What it does | Why it matters |
+|--------------|----------------|
+| **Runs actual tests** | Not self-reported — actually executes test commands |
+| **Checks build** | Verifies compilation/build succeeds |
+| **Runs lint** | Confirms no lint errors |
+| **Validates requirements** | Checks each task requirement against actual code |
+
+The verifier has **no access to the conversation** — only the task description and actual files. This eliminates self-reporting bias.
 
 ---
 
@@ -54,9 +69,10 @@ Traditional AI assistants need constant hand-holding. Prompt, wait, review, prom
 - JWT tokens
 - Unit tests with 80% coverage
 
-Run tests after each change.
-<promise>AUTH COMPLETE</promise>" --max-iterations 20
+Run tests after each change." --max-iterations 20
 ```
+
+When done, output `<complete/>` to trigger verification.
 
 ---
 
@@ -72,23 +88,7 @@ Run tests after each change.
 
 | Option | Description |
 |--------|-------------|
-| `--completion-promise <text>` | Text that signals completion |
 | `--max-iterations <n>` | Safety limit (default: unlimited) |
-
----
-
-## Quality Gates
-
-Autoloop enforces quality before allowing completion:
-
-| Gate | Requirement |
-|------|-------------|
-| **Tests** | All tests must pass (or confirm none exist) |
-| **Build** | Build must succeed (or confirm no build step) |
-| **Lint** | No lint errors (or confirm no linter) |
-| **Task Checklist** | All requirements verified |
-
-The agent must provide a structured completion report with evidence before the loop accepts the promise.
 
 ---
 
@@ -96,9 +96,9 @@ The agent must provide a structured completion report with evidence before the l
 
 | | |
 |---|---|
-| **Be specific** | Clear goals prevent endless loops |
+| **Be specific** | Clear goals help the verifier check requirements |
 | **Set limits** | Always use `--max-iterations` |
-| **Include tests** | Agent must verify tests pass before completing |
+| **Include tests** | The verifier actually runs them |
 | **Use commits** | Ask for commits at milestones |
 
 ---
