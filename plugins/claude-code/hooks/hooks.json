@@ -1,5 +1,5 @@
 {
-  "description": "Autoloop stop hook for autonomous iterative loops",
+  "description": "Autoloop stop hooks for autonomous iterative loops (v2 + v3)",
   "hooks": {
     "Stop": [
       {
@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/hooks/stop.sh"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/stop-work.sh"
           }
         ]
       }

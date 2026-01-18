@@ -1,6 +1,6 @@
-# Autoloop for Claude Code
+# Autoloop v3.0 for Claude Code
 
-Turn Claude Code into an autonomous agent that iterates until your task is complete.
+The Two-Agent Autonomous Coding System for Claude Code.
 
 ---
 
@@ -10,13 +10,15 @@ Turn Claude Code into an autonomous agent that iterates until your task is compl
 claude plugin marketplace add yaoshengzhe/autoloop && claude plugin install autoloop@autoloop
 ```
 
-## Quick Start
+## Quick Start (v3.0)
 
 ```bash
-/autoloop:autoloop Create a Python CLI with tests --max-iterations 5
-```
+# Step 1: Architect creates task breakdown
+/autoloop:init Build a REST API with authentication
 
-Claude works autonomously. When it outputs `<complete/>`, an independent verification agent confirms the work is actually done.
+# Step 2: Engineer executes tasks with TDD
+/autoloop:work
+```
 
 ---
 
@@ -24,76 +26,124 @@ Claude works autonomously. When it outputs `<complete/>`, an independent verific
 
 | Command | Description |
 |---------|-------------|
-| `/autoloop:autoloop <task> [options]` | Start autonomous loop |
-| `/autoloop:cancel-autoloop` | Stop immediately |
+| `/autoloop:init <description>` | Architect: Create prd.json task list |
+| `/autoloop:work [--max-iterations N]` | Engineer: Execute tasks one at a time |
+| `/autoloop:autoloop <task>` | Legacy v2.0 single-agent mode |
+| `/autoloop:cancel-autoloop` | Stop active loop |
 | `/autoloop:autoloop-status` | Check progress |
-
-**Options:** `--max-iterations <n>` | `--help`
 
 ---
 
-## How Verification Works
+## Two-Agent Pattern
 
-When Claude outputs `<complete/>`, a separate verification agent spawns:
+### Architect (init)
+Runs once to analyze your project:
+- Scans directory structure
+- Creates `prd.json` with task breakdown
+- Creates `autoloop-progress.md` for context
 
-1. **No conversation access** — Only sees task description and actual files
-2. **Runs real commands** — Executes tests, build, lint (not self-reported)
-3. **Checks requirements** — Validates each task requirement against code
-4. **Returns verdict** — APPROVED (loop ends) or REJECTED (loop continues with feedback)
+### Engineer (work)
+Runs in a loop, one task at a time:
+- Loads compacted context (prd.json + git log)
+- Enforces TDD for feature tasks (Red-Green cycle)
+- Auto-commits successful tasks
+- Git resets on max retries (safety net)
 
-This eliminates self-reporting bias — the verifier has no knowledge of what Claude *said* it did, only what actually exists.
+---
+
+## TDD Enforcement
+
+Feature tasks follow Red-Green cycle:
+
+| Phase | Goal | Validation |
+|-------|------|------------|
+| RED | Write failing tests | Exit code != 0 |
+| GREEN | Make tests pass | Exit code == 0 |
+
+```json
+{
+  "id": "TASK-002",
+  "type": "feature",
+  "description": "Create game window",
+  "validation_cmd": "pytest tests/test_window.py",
+  "test_file": "tests/test_window.py"
+}
+```
+
+---
+
+## Git Safety Net
+
+| Event | Action |
+|-------|--------|
+| Pre-task | Ensures clean working tree |
+| Success | Auto-commit: `feat(TASK-ID): description` |
+| Max retries | `git reset --hard` to clean state |
+
+---
+
+## Completion Signals
+
+| Signal | When to Use |
+|--------|-------------|
+| `<task-complete/>` | Validation command passed |
+| `<task-stuck reason="..."/>` | Need help, explain why |
+
+---
+
+## Thinking Blocks
+
+The Engineer must use thinking blocks before actions:
+
+```xml
+<thinking>
+1. Current state: RED phase for TASK-002
+2. Need to write failing tests for game window
+3. Will create tests/test_window.py
+4. Tests should import pygame and fail
+</thinking>
+```
+
+---
+
+## Example Workflow
+
+```bash
+# 1. Initialize project
+/autoloop:init Create a CLI todo app with add/remove/list and tests
+
+# 2. Review generated prd.json
+
+# 3. Start worker loop
+/autoloop:work --max-iterations 20
+```
+
+The Architect creates:
+```json
+{
+  "project_name": "CLI Todo App",
+  "tasks": [
+    {"id": "TASK-001", "type": "setup", "description": "Create project structure"},
+    {"id": "TASK-002", "type": "feature", "description": "Add task function"},
+    {"id": "TASK-003", "type": "feature", "description": "List tasks function"}
+  ]
+}
+```
+
+The Engineer executes each task with TDD enforcement.
 
 ---
 
 ## Common Prompt File
 
-Create `.claude/autoloop-prompt.md` with instructions that apply to all loops:
+Create `.claude/autoloop-prompt.md` for shared instructions:
 
 ```markdown
-# Common Instructions
+# Project Rules
 - Run tests after each change
-- Keep commits small and focused
-- Follow existing code style
+- Keep commits focused
+- Follow existing patterns
 ```
-
-This content is automatically prepended to every `/autoloop:autoloop` prompt.
-
----
-
-## Examples
-
-**TDD Loop:**
-```bash
-/autoloop:autoloop "Implement ShoppingCart with TDD. Run pytest after each change." --max-iterations 15
-```
-
-**Feature Build:**
-```bash
-/autoloop:autoloop "Build a markdown blog engine with index page. Commit after each milestone." --max-iterations 20
-```
-
-**Bug Fix:**
-```bash
-/autoloop:autoloop "Fix the memory leak in WebSocket handler. Verify with load test." --max-iterations 10
-```
-
----
-
-## Writing Good Prompts
-
-**Good:** Specific deliverables + verification steps
-
-```bash
-/autoloop:autoloop "Build auth module with login/logout, JWT, and tests. Run tests after each change." --max-iterations 20
-```
-
-**Bad:** Vague goals with no clear requirements
-
-```bash
-/autoloop:autoloop "Make the code better" --max-iterations 10
-```
-
-The verifier needs concrete requirements to check against.
 
 ---
 
@@ -101,6 +151,7 @@ The verifier needs concrete requirements to check against.
 
 | Issue | Solution |
 |-------|----------|
-| Verification keeps failing | Check verifier output for specific issues |
-| Loop runs forever | Add `--max-iterations`; make requirements clearer |
-| Agent stuck | Run `/autoloop:autoloop-status`, then `/autoloop:cancel-autoloop` if needed |
+| prd.json not found | Run `/autoloop:init` first |
+| Task stuck | Check validation_cmd output |
+| Max retries reached | Task marked failed, git reset applied |
+| Loop won't stop | `/autoloop:cancel-autoloop` |

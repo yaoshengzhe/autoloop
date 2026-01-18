@@ -1,11 +1,11 @@
-<h1 align="center">Autoloop</h1>
+<h1 align="center">Autoloop v3.0</h1>
 
 <p align="center">
-<strong>Let your AI agent work autonomously until the job is done.</strong>
+<strong>The Two-Agent Autonomous Coding System</strong>
 </p>
 
 <p align="center">
-Walk away from your keyboard. Return to working code.
+Walk away from your keyboard. Return to working, tested code.
 </p>
 
 ---
@@ -16,63 +16,81 @@ Walk away from your keyboard. Return to working code.
 claude plugin marketplace remove autoloop 2>/dev/null; claude plugin marketplace add yaoshengzhe/autoloop && claude plugin install autoloop@autoloop
 ```
 
-Works for fresh installs and updates alike.
-
-## Run
+## Quick Start (v3.0)
 
 ```bash
-/autoloop:autoloop Build a REST API with tests --max-iterations 15
+# Step 1: Initialize project (Architect creates task breakdown)
+/autoloop:init Build a snake game in Python with tests
+
+# Step 2: Start worker loop (Engineer executes tasks)
+/autoloop:work
 ```
 
-The agent iterates on your task, committing progress along the way. When complete, an **independent verification agent** confirms all tests pass before exiting.
+The **Architect** analyzes your project and creates a structured task list. The **Engineer** executes tasks one at a time with TDD enforcement.
 
 ---
 
-## Why Autoloop?
+## Why v3.0?
 
-Traditional AI assistants need constant hand-holding. Prompt, wait, review, prompt again.
-
-**Autoloop breaks this cycle:**
-
-> **Autonomous** — Define your goal and let it work
->
-> **Self-correcting** — Each iteration builds on the last
->
-> **Independently verified** — A separate agent verifies completion (no self-reporting)
->
-> **Safe** — Max iterations prevent runaway loops
->
-> **Transparent** — All work preserved in files and git
+| Feature | v2.0 | v3.0 |
+|---------|------|------|
+| **Agent Pattern** | Single agent | Two agents (Architect + Engineer) |
+| **Context** | Full conversation | Compacted (prd.json + git log) |
+| **Testing** | Optional | TDD enforced (Red-Green cycle) |
+| **Safety Net** | None | Git auto-commit, reset on failure |
+| **Verification** | Subagent | Per-task validation commands |
 
 ---
 
-## Independent Verification
+## The Two-Agent Pattern
 
-When Claude claims completion with `<complete/>`, an independent verification agent takes over:
+### Architect (Initializer)
+Runs **once** to create the project plan:
+- Scans directory structure
+- Creates `prd.json` (task list)
+- Creates `autoloop-progress.md` (context log)
+- Initializes git if needed
 
-| What it does | Why it matters |
-|--------------|----------------|
-| **Runs actual tests** | Not self-reported — actually executes test commands |
-| **Checks build** | Verifies compilation/build succeeds |
-| **Runs lint** | Confirms no lint errors |
-| **Validates requirements** | Checks each task requirement against actual code |
-
-The verifier has **no access to the conversation** — only the task description and actual files. This eliminates self-reporting bias.
+### Engineer (Worker)
+Runs **in a loop**, one task at a time:
+- Loads context: `prd.json` + `progress.md` + `git log`
+- Enforces TDD for feature tasks
+- Auto-commits on success
+- Git resets on max retries
 
 ---
 
-## Example
+## TDD Workflow
 
-```bash
-/autoloop:autoloop "Build user authentication:
-- Login/logout endpoints
-- JWT tokens
-- Unit tests with 80% coverage
+Feature tasks follow the Red-Green cycle:
 
-Run tests after each change." --max-iterations 20
+```
+1. RED Phase   → Write tests that FAIL
+2. GREEN Phase → Write code to make tests PASS
+3. Auto-commit → Changes saved with task ID
 ```
 
-When done, output `<complete/>` to trigger verification.
+Each task has a `validation_cmd` that must pass:
+```json
+{
+  "id": "TASK-002",
+  "type": "feature",
+  "description": "Create game window",
+  "validation_cmd": "pytest tests/test_window.py"
+}
+```
+
+---
+
+## Git Safety Net
+
+| When | What Happens |
+|------|--------------|
+| **Pre-task** | Ensures clean working tree |
+| **Success** | Auto-commits: `feat(TASK-002): description` |
+| **Failure** | After max retries: `git reset --hard` |
+
+Your code is always safe. Failed experiments are automatically cleaned up.
 
 ---
 
@@ -80,15 +98,45 @@ When done, output `<complete/>` to trigger verification.
 
 | Command | Purpose |
 |---------|---------|
-| `/autoloop:autoloop <task> [options]` | Start autonomous loop |
-| `/autoloop:cancel-autoloop` | Stop the loop |
+| `/autoloop:init <description>` | Create project plan (Architect) |
+| `/autoloop:work [--max-iterations N]` | Execute tasks (Engineer) |
+| `/autoloop:autoloop <task>` | Legacy single-agent mode |
+| `/autoloop:cancel-autoloop` | Stop active loop |
 | `/autoloop:autoloop-status` | Check progress |
 
-### Options
+---
 
-| Option | Description |
-|--------|-------------|
-| `--max-iterations <n>` | Safety limit (default: unlimited) |
+## Example
+
+```bash
+# Initialize
+/autoloop:init Create a CLI todo app with:
+- Add/remove/list tasks
+- Save to JSON file
+- Unit tests
+
+# Review prd.json, then start working
+/autoloop:work --max-iterations 30
+```
+
+The Engineer uses `<thinking>` blocks before each action:
+
+```xml
+<thinking>
+1. Current task: Write tests for add_task function
+2. Need to create tests/test_todo.py
+3. Tests should fail (RED phase)
+</thinking>
+```
+
+---
+
+## Completion Signals
+
+| Signal | Meaning |
+|--------|---------|
+| `<task-complete/>` | Task validation passed |
+| `<task-stuck reason="..."/>` | Need help |
 
 ---
 
@@ -96,17 +144,17 @@ When done, output `<complete/>` to trigger verification.
 
 | | |
 |---|---|
-| **Be specific** | Clear goals help the verifier check requirements |
-| **Set limits** | Always use `--max-iterations` |
-| **Include tests** | The verifier actually runs them |
-| **Use commits** | Ask for commits at milestones |
+| **Use TDD tasks** | Features get automatic Red-Green enforcement |
+| **Set max iterations** | Safety limit prevents runaway loops |
+| **Check prd.json** | Review task breakdown before starting |
+| **Trust git** | Failed tasks reset automatically |
 
 ---
 
 ## Plugin Management
 
 ```bash
-# Update (same as install command)
+# Update
 claude plugin marketplace remove autoloop 2>/dev/null; claude plugin marketplace add yaoshengzhe/autoloop && claude plugin install autoloop@autoloop
 
 # Uninstall

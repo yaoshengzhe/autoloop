@@ -1,7 +1,7 @@
 {
   "name": "autoloop",
-  "version": "0.3.0",
-  "description": "Let your AI agent work autonomously until the job is done",
+  "version": "1.0.0",
+  "description": "Two-Agent Autonomous Coding System with TDD enforcement",
   "type": "module",
   "main": "src/index.js",
   "types": "src/types.d.ts",

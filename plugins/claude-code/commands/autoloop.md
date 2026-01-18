@@ -11,41 +11,55 @@ Start an autonomous iterative loop that continues until completion criteria are 
 if [ -z "$ARGUMENTS" ] || [ "$ARGUMENTS" = "-h" ] || [ "$ARGUMENTS" = "--help" ]; then
   echo "[AUTOLOOP_HELP_SHOWN]"
   cat <<'HELP'
-Autoloop - Autonomous iterative loop for Claude Code
+Autoloop v3.0 - Autonomous Coding Loop
 
-USAGE:
+Two modes available:
+
+  v3.0 TWO-AGENT PATTERN (Recommended):
+    /autoloop:init <description>  - Architect: Create prd.json task breakdown
+    /autoloop:work                - Engineer: Execute tasks with TDD
+
+  v2.0 SINGLE-AGENT (Legacy):
+    /autoloop <task>              - Single loop with subagent verification
+
+═══════════════════════════════════════════════════════════
+
+v3.0 WORKFLOW:
+
+  1. Initialize project:
+     /autoloop:init Build a snake game in Python
+
+  2. Review prd.json (created by init)
+
+  3. Start worker loop:
+     /autoloop:work
+
+  Features:
+    • TDD Enforcement (Red-Green cycle)
+    • Git-based safety net (auto-commit, reset on failure)
+    • Context compaction (prd.json + progress.md + git log)
+    • <thinking> blocks required before actions
+
+═══════════════════════════════════════════════════════════
+
+v2.0 USAGE:
   /autoloop <task> [OPTIONS]
 
 OPTIONS:
-  --max-iterations <n>  Maximum iterations before auto-stop (default: unlimited)
+  --max-iterations <n>  Maximum iterations (default: unlimited)
   -h, --help            Show this help message
-
-DESCRIPTION:
-  Starts an autonomous loop that keeps working until completion. Uses
-  independent subagent verification for rigorous quality control.
-
-  To signal completion, output: <complete/>
-
-  An independent verification agent (with NO access to the conversation)
-  will then check tests, build, lint, and task requirements.
 
 EXAMPLES:
   /autoloop Build a REST API --max-iterations 20
   /autoloop Fix the auth bug --max-iterations 10
-  /autoloop "Refactor cache layer"
 
-COMMON PROMPT FILE:
-  Create .claude/autoloop-prompt.md with common instructions that apply to all loops.
-  This content is automatically prepended to every loop prompt.
-
-STOPPING THE LOOP:
-  - Reaching --max-iterations limit
-  - Outputting <complete/> and passing verification
-  - Running /autoloop:cancel-autoloop
+STOPPING:
+  - <complete/> and passing verification
+  - /autoloop:cancel-autoloop
 
 OTHER COMMANDS:
-  /autoloop:autoloop-status   Check current loop progress
-  /autoloop:cancel-autoloop   Stop the active loop
+  /autoloop:autoloop-status   Check loop progress
+  /autoloop:cancel-autoloop   Stop active loop
 HELP
   exit 0
 fi
@@ -54,8 +68,13 @@ fi
 
 echo ""
 echo "═══════════════════════════════════════════════════════════"
-echo "AUTOLOOP - Independent Verification System"
+echo "AUTOLOOP v2.0 - Independent Verification System"
 echo "═══════════════════════════════════════════════════════════"
+echo ""
+echo "TIP: Try v3.0 for TDD and better context management:"
+echo "     /autoloop:init <description>  then  /autoloop:work"
+echo ""
+echo "───────────────────────────────────────────────────────────"
 echo ""
 echo "When you believe the task is complete, output: <complete/>"
 echo ""
